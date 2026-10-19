@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/facturacion/resumen-diario",
+      "schedule": "0 5 * * *"
+    }
+  ]
+}

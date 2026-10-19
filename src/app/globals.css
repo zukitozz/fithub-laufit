@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-family: var(--font-body), system-ui, sans-serif;
+  background-color: #f6f6f7;
+  color: #17171b;
+  font-size: 15px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    font-size: 15.5px;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background: #f6f6f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(209, 15, 21, 0.18);
+}
+
+.font-display {
+  font-family: var(--font-display), Impact, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #d10f15;
+}
+
+.page-heading {
+  font-family: var(--font-display), Impact, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #0b0b0d;
+}
+
+@layer components {
+  .btn-brand {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-laufit-600 px-5 py-2.5 text-sm font-bold text-white shadow-[0_10px_22px_rgba(209,15,21,0.25)] transition hover:bg-laufit-700 focus:outline-none focus:ring-4 focus:ring-laufit-100 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-ghost {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-ink-200 bg-white px-5 py-2.5 text-sm font-semibold text-ink-800 transition hover:bg-ink-50 focus:outline-none focus:ring-4 focus:ring-ink-100 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-sm {
+    @apply min-h-9 rounded-lg px-3 py-1.5 text-xs;
+  }
+
+  .card-surface {
+    @apply rounded-2xl border border-ink-100 bg-white p-5 shadow-soft;
+  }
+
+  .field {
+    @apply min-h-11 w-full rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-900 outline-none transition placeholder:text-ink-300 focus:border-laufit-500 focus:ring-4 focus:ring-laufit-100;
+  }
+
+  .label {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-500;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold;
+  }
+
+  .th {
+    @apply px-3 py-2 text-left text-xs font-bold uppercase tracking-wide text-ink-500;
+  }
+
+  .td {
+    @apply px-3 py-2.5 text-sm text-ink-800;
+  }
+}
+
+button:focus-visible,
+a:focus-visible {
+  @apply outline-none ring-4 ring-laufit-100;
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(-8px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.tarjeta-nueva {
+  animation: aparecer 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-nueva { animation: none; }
+}

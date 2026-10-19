@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "FacturaTipo" ADD VALUE 'NOTA_DESPACHO';

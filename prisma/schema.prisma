@@ -1,0 +1,449 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Usuarios del sistema (quienes inician sesión). Los coaches y los socios NO son User.
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  SUPERVISOR
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(ADMIN)
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  membresiasVendidas Membresia[]
+  facturas           Factura[]
+  cierresTurno       CierreTurno[]
+  movimientosInventario MovimientoInventario[]
+  contactos          ContactoSocio[]
+}
+
+// ---------------------------------------------------------------------------
+// Socios, planes y membresías
+// ---------------------------------------------------------------------------
+
+enum TipoDocumento {
+  DNI // catálogo 06 SUNAT: 1
+  CE // 4
+  RUC // 6
+}
+
+enum UnidadDuracion {
+  MESES
+  DIAS
+}
+
+model Socio {
+  id              String        @id @default(uuid())
+  nombre          String
+  tipoDocumento   TipoDocumento @default(DNI)
+  numeroDocumento String
+  razonSocial     String? // si factura con RUC
+  rucFactura      String?
+  celular         String? // E.164: +51...
+  email           String?
+  fechaNacimiento DateTime?     @db.Date
+  // Foto en S3 (key, no URL). La administradora la compara con la persona que marca.
+  fotoKey         String?
+  contactoEmergencia  String?
+  telefonoEmergencia  String?
+  condicionMedica     String?
+  notas               String?
+  consentimientoWhatsApp       Boolean   @default(false)
+  consentimientoWhatsAppAt     DateTime?
+  consentimientoWhatsAppOrigen String?
+  recordatorioPospuestoHasta   DateTime?
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  membresias  Membresia[]
+  asistencias Asistencia[]
+  facturas    Factura[]
+  contactos   ContactoSocio[]
+
+  @@unique([tipoDocumento, numeroDocumento])
+  @@index([nombre])
+}
+
+model Plan {
+  id           String         @id @default(uuid())
+  nombre       String
+  duracion     Int // 1, 2, 3, 6, 12 (meses) o N días
+  unidad       UnidadDuracion @default(MESES)
+  precio       Float // con IGV
+  matricula    Float          @default(0)
+  esPaseDiario Boolean        @default(false)
+  activo       Boolean        @default(true)
+  orden        Int            @default(0)
+  createdAt    DateTime       @default(now())
+
+  membresias Membresia[]
+}
+
+model Membresia {
+  id            String   @id @default(uuid())
+  socio         Socio    @relation(fields: [socioId], references: [id])
+  socioId       String
+  plan          Plan     @relation(fields: [planId], references: [id])
+  planId        String
+  fechaInicio   DateTime @db.Date
+  fechaFin      DateTime @db.Date
+  // Precio del plan al momento de la venta (sin descuentos: no se edita).
+  precio        Float
+  anulada       Boolean  @default(false)
+  anuladaMotivo String?
+  anuladaPorId  String?
+  anuladaAt     DateTime?
+  usuario       User     @relation(fields: [usuarioId], references: [id])
+  usuarioId     String
+  factura       Factura? @relation(fields: [facturaId], references: [id])
+  facturaId     String?
+  creadoAt      DateTime @default(now())
+
+  @@index([socioId, fechaFin])
+}
+
+// ---------------------------------------------------------------------------
+// Seguimiento: contactos con el socio (llamadas, saludos de cumpleaños)
+// ---------------------------------------------------------------------------
+
+enum MotivoContacto {
+  VENCIMIENTO
+  CUMPLEANOS
+  OTRO
+}
+
+model ContactoSocio {
+  id        String         @id @default(uuid())
+  socio     Socio          @relation(fields: [socioId], references: [id])
+  socioId   String
+  motivo    MotivoContacto
+  nota      String
+  usuario   User           @relation(fields: [usuarioId], references: [id])
+  usuarioId String
+  creadoAt  DateTime       @default(now())
+
+  @@index([socioId, creadoAt])
+}
+
+// ---------------------------------------------------------------------------
+// Asistencia de socios (auto-marcación por QR, verificada en el panel de recepción)
+// ---------------------------------------------------------------------------
+
+enum OrigenAsistencia {
+  QR
+  RECEPCION
+}
+
+enum EstadoMembresiaAlMarcar {
+  VIGENTE
+  POR_VENCER
+  VENCIDA
+  SIN_MEMBRESIA
+}
+
+enum ValidacionAsistencia {
+  PENDIENTE
+  CONFIRMADA
+  ANULADA
+}
+
+model Asistencia {
+  id              String                  @id @default(uuid())
+  socio           Socio                   @relation(fields: [socioId], references: [id])
+  socioId         String
+  membresiaId     String?
+  fechaHora       DateTime                @default(now()) // hora del servidor
+  origen          OrigenAsistencia
+  estadoMembresia EstadoMembresiaAlMarcar
+  diasRestantes   Int?
+  validacion      ValidacionAsistencia    @default(PENDIENTE)
+  validadaPorId   String?
+  validadaAt      DateTime?
+  motivo          String? // obligatorio al anular
+  ip              String?
+
+  @@index([socioId, fechaHora])
+  @@index([fechaHora])
+}
+
+// ---------------------------------------------------------------------------
+// Coaches (no inician sesión): marcan entrada y salida con el mismo QR
+// ---------------------------------------------------------------------------
+
+enum TipoMarcacion {
+  ENTRADA
+  SALIDA
+}
+
+enum OrigenMarcacion {
+  QR
+  MANUAL
+}
+
+model Coach {
+  id              String        @id @default(uuid())
+  nombre          String
+  tipoDocumento   TipoDocumento @default(DNI)
+  numeroDocumento String
+  celular         String?
+  activo          Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+
+  marcaciones MarcacionCoach[]
+
+  @@unique([tipoDocumento, numeroDocumento])
+}
+
+model MarcacionCoach {
+  id              String          @id @default(uuid())
+  coach           Coach           @relation(fields: [coachId], references: [id])
+  coachId         String
+  tipo            TipoMarcacion
+  fechaHora       DateTime        @default(now()) // hora del servidor, no la del teléfono
+  origen          OrigenMarcacion
+  anulada         Boolean         @default(false)
+  observacion     String?
+  registradaPorId String? // si fue MANUAL o anulada: el User
+  ip              String?
+
+  @@index([coachId, fechaHora])
+}
+
+// ---------------------------------------------------------------------------
+// Facturación (facturador-api). BOLETA, FACTURA y NOTA_CREDITO van a SUNAT; NOTA_DESPACHO es interna (no se envía).
+// ---------------------------------------------------------------------------
+
+enum FacturaTipo {
+  BOLETA
+  FACTURA
+  NOTA_CREDITO
+  NOTA_DESPACHO
+}
+
+enum MetodoPago {
+  EFECTIVO
+  TARJETA
+  YAPE
+  PLIN
+  TRANSFERENCIA
+  DEPOSITO
+  MIXTO
+}
+
+model Factura {
+  id      String      @id @default(uuid())
+  // Opcional: una venta de productos puede ser a "cliente varios".
+  socio   Socio?      @relation(fields: [socioId], references: [id])
+  socioId String?
+  tipo    FacturaTipo
+  total   Float
+  gravadas Float?
+  igv      Float?
+  metodoPago        MetodoPago
+  pagoEfectivo      Float?
+  pagoTarjeta       Float?
+  pagoYape          Float?
+  pagoTransferencia Float?
+  pagoDeposito      Float?
+  activo    Boolean  @default(true)
+  creadoAt  DateTime @default(now())
+
+  // Receptor: copia (snapshot) al momento de emitir.
+  receptorTipoDocumento   String // catálogo 06: 1=DNI, 4=CE, 6=RUC
+  receptorNumeroDocumento String
+  receptorNombre          String
+
+  tipoComprobante       String? // catálogo 01: 01, 03, 07
+  numeracionComprobante String?
+  fechaEmision          DateTime?
+  tipoMoneda            String?   @default("PEN")
+  montoLetras           String?
+
+  // Solo notas de crédito
+  tipoNota                    String?
+  tipoDocumentoAfectado       String?
+  numeracionDocumentoAfectado String?
+  motivoDocumentoAfectado     String?
+  facturaAfectadaId           String?
+
+  // Resultado del facturador
+  enviado            Boolean @default(false)
+  estadoFacturador   String?
+  cadenaParaCodigoQr String?
+  codigoHash         String?
+  errors             String?
+  // Se guardan sin reformatear: si cambia un espacio, la firma deja de validar.
+  xmlEnvio           String?
+  // CDR de SUNAT. El facturador solo lo conserva 7 días tras la aceptación.
+  cdr                String?
+
+  usuario   User?   @relation(fields: [usuarioId], references: [id])
+  usuarioId String?
+
+  // Cierre de turno que contabilizó este comprobante (null = aún pendiente de cerrar).
+  cierreTurno   CierreTurno? @relation(fields: [cierreTurnoId], references: [id])
+  cierreTurnoId String?
+
+  items       FacturaItem[]
+  membresias  Membresia[]
+
+  @@index([socioId])
+  @@index([creadoAt])
+  @@index([cierreTurnoId])
+}
+
+model FacturaItem {
+  id             String  @id @default(uuid())
+  factura        Factura @relation(fields: [facturaId], references: [id])
+  facturaId      String
+  nombre         String
+  cantidad       Int     @default(1)
+  precioUnit     Float // con IGV
+  total          Float
+  codigoProducto String?
+  producto       Producto? @relation(fields: [productoId], references: [id])
+  productoId     String?
+
+  @@index([productoId])
+}
+
+// ---------------------------------------------------------------------------
+// Productos (market) e inventario
+// ---------------------------------------------------------------------------
+
+enum MovimientoTipo {
+  ENTRADA
+  SALIDA
+  AJUSTE
+}
+
+model Producto {
+  id           String   @id @default(uuid())
+  nombre       String
+  categoria    String?
+  codigoBarras String?  @unique
+  // Precio de venta con IGV. Sin descuentos: el precio es el del catálogo.
+  precioVenta  Float
+  precioCosto  Float?
+  stock        Int      @default(0)
+  alertaStock  Int      @default(5)
+  // false para ítems sin inventario (p. ej. un servicio): no descuentan stock.
+  controlaStock Boolean @default(true)
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  items       FacturaItem[]
+  movimientos MovimientoInventario[]
+
+  @@index([nombre])
+}
+
+model MovimientoInventario {
+  id            String         @id @default(uuid())
+  producto      Producto       @relation(fields: [productoId], references: [id])
+  productoId    String
+  tipo          MovimientoTipo
+  // Siempre positiva; el tipo dice si suma o resta. En AJUSTE es la diferencia respecto al stock anterior (absoluta).
+  cantidad      Int
+  stockAnterior Int
+  stockNuevo    Int
+  motivo        String?
+  facturaId     String?
+  usuario       User           @relation(fields: [usuarioId], references: [id])
+  usuarioId     String
+  creadoAt      DateTime       @default(now())
+
+  @@index([productoId, creadoAt])
+}
+
+// ---------------------------------------------------------------------------
+// Cierre de turno: congela lo cobrado desde el cierre anterior
+// ---------------------------------------------------------------------------
+
+model CierreTurno {
+  id                 String   @id @default(uuid())
+  usuario            User     @relation(fields: [usuarioId], references: [id])
+  usuarioId          String
+  fechaInicio        DateTime
+  fechaFin           DateTime
+  // Netos: las notas de crédito restan.
+  totalVentas        Float
+  totalEfectivo      Float
+  totalTarjeta       Float
+  totalYape          Float // Yape y Plin
+  totalTransferencia Float    @default(0)
+  totalDeposito      Float    @default(0)
+  // Efectivo que la administradora contó en caja y su diferencia con el esperado (totalEfectivo).
+  efectivoContado    Float?
+  diferencia         Float?
+  notas              String?
+  cantidadComprobantes Int    @default(0)
+  creadoAt           DateTime @default(now())
+  facturas           Factura[]
+
+  @@index([fechaFin])
+}
+
+model Serie {
+  id              String  @id @default(uuid())
+  tipoComprobante String  @db.VarChar(2) // 01, 03, 07
+  serie           String  @db.VarChar(3)
+  estado          Int     @default(1)
+  descripcion     String? @db.VarChar(200)
+}
+
+model Correlativo {
+  id            String   @id @default(uuid())
+  tipoDocumento String   @db.VarChar(2)
+  serie         String   @db.VarChar(3)
+  prefijo       String   @db.VarChar(2)
+  numeracion    Int      @default(0)
+  estado        String   @default("A") @db.Char(1)
+  ruc           String   @db.VarChar(11)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([ruc, tipoDocumento, serie, prefijo])
+}
+
+// ---------------------------------------------------------------------------
+// Configuración (una sola fila, id "default")
+// ---------------------------------------------------------------------------
+
+model Configuracion {
+  id                          String   @id @default("default")
+  nombreGimnasio              String   @default("LAUFIT Fitness Club")
+  direccion                   String?
+  telefonoContacto            String?
+  // Datos fiscales del emisor (no van en variables de entorno)
+  ruc                         String?  @db.VarChar(11)
+  razonSocial                 String?
+  direccionFiscal             String?
+  codigoUbigeo                String?
+  // Membresías
+  diasAvisoVencimiento        Int      @default(7)
+  diasGracia                  Int      @default(0)
+  // Asistencia
+  minutosAntiDuplicadoIngreso Int      @default(60)
+  // Token del QR de la sede; el supervisor puede regenerarlo si el QR se filtra.
+  qrToken                     String   @default(uuid())
+  // { "1": ["05:30","22:00"], ... "0": ["09:00","14:00"] } (0 = domingo)
+  horarioAtencion             Json?
+  whatsappActivo              Boolean  @default(false)
+  actualizadoAt               DateTime @updatedAt
+}
