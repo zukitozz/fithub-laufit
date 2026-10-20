@@ -75,6 +75,6 @@ Auth.js exige confiar en el host cuando se ejecuta en modo producción (`next st
 
 FitHub llama al servicio de notificaciones (`spec-consumo-notificaciones-gimnasio.md`); nunca habla con Meta. Variables `NOTIF_*` en `.env.example`. Los avisos solo salen si **Ajustes → WhatsApp activo** está encendido, el socio aceptó y no se dio de baja.
 
-- Al vender una membresía: bienvenida/renovación y comprobante con PDF (se guarda en S3 en `comprobantes/` y se firma justo antes de enviar).
+- Al vender una membresía: bienvenida/renovación y comprobante con PDF (se guarda en S3 en `socios/comprobantes/` y se firma justo antes de enviar).
 - Tarea diaria `/api/avisos/vencimientos` (Vercel Cron, 08:00 Lima, con `CRON_SECRET`): avisos de 3 días y de hoy, y reintento de los pendientes.
 - Cada aviso queda en `EnvioWhatsApp` con su `referenciaExterna` (`membresía:fechaFin:tipo`); repetir la tarea no duplica mensajes.

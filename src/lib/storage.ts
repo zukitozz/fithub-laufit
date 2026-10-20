@@ -54,7 +54,8 @@ const PDF_EXPIRACION_SEGUNDOS = 60 * 60 // WhatsApp descarga el archivo al envia
 
 /** Guarda el PDF de un comprobante y devuelve su key de S3. */
 export async function guardarPdfComprobante(facturaId: string, bytes: Uint8Array): Promise<string> {
-  const key = `comprobantes/${facturaId}.pdf`
+  // Bajo socios/: el usuario IAM de la app solo tiene permiso de escritura y lectura sobre ese prefijo.
+  const key = `socios/comprobantes/${facturaId}.pdf`
   await s3.send(new PutObjectCommand({ Bucket: BUCKET, Key: key, Body: bytes, ContentType: 'application/pdf' }))
   return key
 }
