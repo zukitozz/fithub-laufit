@@ -18,6 +18,7 @@ interface Config {
   diasAvisoVencimiento: number
   diasGracia: number
   minutosAntiDuplicadoIngreso: number
+  whatsappActivo: boolean
 }
 interface Serie { id: string; tipoComprobante: string; serie: string; estado: number; descripcion: string | null }
 
@@ -130,6 +131,14 @@ export default function AjustesPage() {
               <Numero id="gr" titulo="Días de gracia tras vencer" valor={form.diasGracia} onChange={(v) => set('diasGracia', v)} />
               <Numero id="ad" titulo="No repetir ingreso antes de (min)" valor={form.minutosAntiDuplicadoIngreso} onChange={(v) => set('minutosAntiDuplicadoIngreso', v)} />
             </div>
+          </div>
+
+          <div>
+            <h2 className="font-display text-2xl font-bold">Avisos por WhatsApp</h2>
+            <label className="mt-3 flex items-start gap-3 rounded-xl bg-ink-50 px-4 py-3 text-sm">
+              <input type="checkbox" checked={form.whatsappActivo} onChange={(e) => set('whatsappActivo', e.target.checked)} className="mt-0.5 h-5 w-5 accent-laufit-600" />
+              <span>Enviar por WhatsApp la bienvenida, el comprobante y los avisos de vencimiento (solo a socios que aceptaron). Con esto apagado no sale ningún mensaje.</span>
+            </label>
           </div>
 
           <div className="flex justify-end"><button type="submit" disabled={guardando} className="btn-brand">{guardando && <Spinner />} Guardar ajustes</button></div>
