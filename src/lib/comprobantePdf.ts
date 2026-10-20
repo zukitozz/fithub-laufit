@@ -266,3 +266,20 @@ export async function generarPdfComprobante(d: ComprobantePdfDatos, emisor: Emis
 
   return pdf.save()
 }
+
+/** PDF de una factura guardada, con los datos del emisor tomados de la configuración. */
+export async function generarPdfDeFactura(
+  factura: Omit<ComprobantePdfDatos, 'fechaEmision'> & { fechaEmision: Date | null; creadoAt: Date },
+  config: { ruc: string | null; razonSocial: string | null; nombreGimnasio: string; direccionFiscal: string | null; direccion: string | null; telefonoContacto: string | null },
+): Promise<Uint8Array> {
+  return generarPdfComprobante(
+    { ...factura, fechaEmision: factura.fechaEmision ?? factura.creadoAt },
+    {
+      razonSocial: config.razonSocial || config.nombreGimnasio,
+      ruc: config.ruc || process.env.FACTURADOR_RUC_EMISOR || '',
+      direccionFiscal: config.direccionFiscal || config.direccion || '',
+      nombreComercial: config.nombreGimnasio,
+      telefono: config.telefonoContacto,
+    },
+  )
+}

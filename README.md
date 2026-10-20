@@ -64,3 +64,17 @@ Entra a http://localhost:3000 con `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Luego, en **
 ## Despliegue fuera de Vercel
 
 Auth.js exige confiar en el host cuando se ejecuta en modo producción (`next start`) en un servidor propio: define `AUTH_TRUST_HOST=true` y `NEXTAUTH_URL` con la URL pública. En Vercel no hace falta.
+
+## Producción
+
+- URL: https://fithub-laufit.vercel.app (proyecto `fithub-laufit` en Vercel, conectado al repositorio `zukitozz/fithub-laufit`; cada push a `main` se despliega solo).
+- Las migraciones pendientes se aplican en el build de producción (`vercel-build`).
+- Base de datos: RDS `laufitness-db` (us-east-2). Fotos: bucket S3 privado `laufitness-fotos-945209558238`.
+
+## Avisos por WhatsApp
+
+FitHub llama al servicio de notificaciones (`spec-consumo-notificaciones-gimnasio.md`); nunca habla con Meta. Variables `NOTIF_*` en `.env.example`. Los avisos solo salen si **Ajustes → WhatsApp activo** está encendido, el socio aceptó y no se dio de baja.
+
+- Al vender una membresía: bienvenida/renovación y comprobante con PDF (se guarda en S3 en `comprobantes/` y se firma justo antes de enviar).
+- Tarea diaria `/api/avisos/vencimientos` (Vercel Cron, 08:00 Lima, con `CRON_SECRET`): avisos de 3 días y de hoy, y reintento de los pendientes.
+- Cada aviso queda en `EnvioWhatsApp` con su `referenciaExterna` (`membresía:fechaFin:tipo`); repetir la tarea no duplica mensajes.

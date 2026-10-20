@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { requireApiAuth } from '@/lib/api-auth'
 import { obtenerConfiguracion } from '@/lib/config'
 import { situacionSocio } from '@/lib/membresias'
+import { sincronizarConsentimiento } from '@/lib/avisosWhatsApp'
 import { leerSocio } from '@/lib/socios'
 import { urlFirmada } from '@/lib/storage'
 
@@ -81,5 +82,7 @@ export async function POST(req: Request) {
       ...(consentimientoWhatsApp ? { consentimientoWhatsAppAt: new Date(), consentimientoWhatsAppOrigen: 'ALTA_RECEPCION' } : {}),
     },
   })
-  return NextResponse.json(socio, { status: 201 })
+  // El consentimiento también se informa al servicio de WhatsApp; si es baja voluntaria, el socio queda sin consentimiento.
+  const sincronizacion = consentimientoWhatsApp ? await sincronizarConsentimiento(socio.id, socio.celular, true, 'formulario-matricula') : 'OMITIDO'
+  return NextResponse.json({ ...socio, ...(sincronizacion === 'BAJA_VOLUNTARIA' ? { consentimientoWhatsApp: false, bajaVoluntariaWhatsApp: true } : {}), whatsappSincronizado: sincronizacion }, { status: 201 })
 }

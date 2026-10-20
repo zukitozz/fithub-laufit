@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireApiAuth } from '@/lib/api-auth'
 import { obtenerConfiguracion } from '@/lib/config'
-import { generarPdfComprobante } from '@/lib/comprobantePdf'
+import { generarPdfDeFactura } from '@/lib/comprobantePdf'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,17 +17,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
   ])
   if (!factura) return NextResponse.json({ error: 'Comprobante no encontrado' }, { status: 404 })
 
-  const ruc = config.ruc || process.env.FACTURADOR_RUC_EMISOR || ''
-  const bytes = await generarPdfComprobante(
-    { ...factura, fechaEmision: factura.fechaEmision ?? factura.creadoAt },
-    {
-      razonSocial: config.razonSocial || config.nombreGimnasio,
-      ruc,
-      direccionFiscal: config.direccionFiscal || config.direccion || '',
-      nombreComercial: config.nombreGimnasio,
-      telefono: config.telefonoContacto,
-    },
-  )
+  const bytes = await generarPdfDeFactura(factura, config)
 
   const nombre = `${factura.numeracionComprobante ?? factura.id}.pdf`
   return new Response(bytes as unknown as BodyInit, {

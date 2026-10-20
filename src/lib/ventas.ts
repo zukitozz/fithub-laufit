@@ -8,6 +8,7 @@ import { calcularFechaFin, fechaDesdeTexto, hoyFecha, inicioPorDefecto, seSuperp
 import { CODIGO_SUNAT_TIPO_COMPROBANTE, ETIQUETA_COMPROBANTE, TIPO_DOCUMENTO_CORRELATIVO, VA_A_SUNAT } from '@/lib/comprobantes'
 import { numeroALetras } from '@/lib/numeroALetras'
 import { construirReceptor } from '@/lib/receptor'
+import { avisarBienvenida, avisarComprobante } from '@/lib/avisosWhatsApp'
 import { resolverPagosFactura, type PagoParcial } from '@/lib/pagos'
 
 const IGV_PORCENTAJE = Number(process.env.IGV_PORCENTAJE || '18')
@@ -130,11 +131,13 @@ export async function venderMembresia(input: VentaMembresiaInput): Promise<Resul
 
   // Fuera de la transacción: un fallo del facturador no debe deshacer la venta.
   // Se envía siempre al emitir (la nota de despacho es interna y no va). Si falla, el reintento nocturno lo reenvía.
+  let factura = creado.factura
   if (VA_A_SUNAT[input.tipoComprobante]) {
-    const enviada = await enviarFacturaASunat(creado.factura.id).catch(() => null)
-    if (enviada) return { ok: true, membresia: creado.membresia, factura: enviada }
+    factura = (await enviarFacturaASunat(creado.factura.id).catch(() => null)) ?? factura
   }
-  return { ok: true, ...creado }
+  // Avisos por WhatsApp: no lanzan; si el servicio no responde quedan pendientes para la tarea diaria.
+  await Promise.all([avisarBienvenida(creado.membresia.id), avisarComprobante(creado.membresia.id)])
+  return { ok: true, membresia: creado.membresia, factura }
 }
 
 /**

@@ -49,3 +49,21 @@ export async function urlFirmada(key: string | null | undefined): Promise<string
     return null
   }
 }
+
+const PDF_EXPIRACION_SEGUNDOS = 60 * 60 // WhatsApp descarga el archivo al enviar; debe valer al menos 10 minutos
+
+/** Guarda el PDF de un comprobante y devuelve su key de S3. */
+export async function guardarPdfComprobante(facturaId: string, bytes: Uint8Array): Promise<string> {
+  const key = `comprobantes/${facturaId}.pdf`
+  await s3.send(new PutObjectCommand({ Bucket: BUCKET, Key: key, Body: bytes, ContentType: 'application/pdf' }))
+  return key
+}
+
+/** URL https firmada de un PDF para que WhatsApp lo descargue sin autenticación. Firmarla justo antes de enviar. */
+export async function urlFirmadaPdf(key: string, nombreArchivo: string): Promise<string> {
+  return getSignedUrl(
+    s3,
+    new GetObjectCommand({ Bucket: BUCKET, Key: key, ResponseContentDisposition: `inline; filename="${nombreArchivo}"`, ResponseContentType: 'application/pdf' }),
+    { expiresIn: PDF_EXPIRACION_SEGUNDOS },
+  )
+}

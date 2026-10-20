@@ -30,6 +30,8 @@ interface Detalle {
   razonSocial: string | null
   consentimientoWhatsApp: boolean
   consentimientoWhatsAppAt: string | null
+  bajaVoluntariaWhatsApp: boolean
+  enviosWhatsApp: { id: string; tipo: string; estado: string; error: string | null; creadoAt: string }[]
   fotoUrl: string | null
   estado: string
   diasRestantes: number | null
@@ -46,6 +48,9 @@ interface Detalle {
   }[]
   asistencias: { id: string; fechaHora: string; validacion: string; origen: string }[]
 }
+
+const ETIQUETA_AVISO: Record<string, string> = { BIENVENIDA: 'Bienvenida', COMPROBANTE: 'Comprobante', D3: 'Vence en 3 días', D0: 'Vence hoy' }
+const ETIQUETA_ENVIO: Record<string, string> = { ENVIADO: 'Enviado', PENDIENTE: 'Pendiente', FALLIDO: 'Fallido', SIN_CONSENTIMIENTO: 'Sin consentimiento' }
 
 export default function SocioPage() {
   const { id } = useParams<{ id: string }>()
@@ -79,6 +84,7 @@ export default function SocioPage() {
     rucFactura: data.rucFactura ?? '',
     razonSocial: data.razonSocial ?? '',
     consentimientoWhatsApp: data.consentimientoWhatsApp,
+    bajaVoluntariaWhatsApp: data.bajaVoluntariaWhatsApp,
     fotoUrl: data.fotoUrl,
   }
 
@@ -144,8 +150,18 @@ export default function SocioPage() {
               <Dato titulo="Condición médica" valor={data.condicionMedica ?? '—'} />
               <Dato titulo="Notas" valor={data.notas ?? '—'} />
               <Dato titulo="Datos de factura" valor={data.rucFactura ? `${data.rucFactura} · ${data.razonSocial ?? ''}` : '—'} />
-              <Dato titulo="WhatsApp" valor={data.consentimientoWhatsApp ? `Aceptado ${fechaHoraLima(data.consentimientoWhatsAppAt)}` : 'Sin consentimiento'} />
+              <Dato titulo="WhatsApp" valor={data.bajaVoluntariaWhatsApp ? 'Pidió no recibir mensajes (baja voluntaria)' : data.consentimientoWhatsApp ? `Aceptado ${fechaHoraLima(data.consentimientoWhatsAppAt)}` : 'Sin consentimiento'} />
             </dl>
+            {data.enviosWhatsApp.length > 0 && (
+              <ul className="mt-3 space-y-1 border-t border-ink-100 pt-3 text-xs text-ink-500">
+                {data.enviosWhatsApp.map((e) => (
+                  <li key={e.id} className="flex justify-between gap-2" title={e.error ?? undefined}>
+                    <span>{fechaHoraLima(e.creadoAt)} · {ETIQUETA_AVISO[e.tipo] ?? e.tipo}</span>
+                    <span className="font-semibold">{ETIQUETA_ENVIO[e.estado] ?? e.estado}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
 
           <section className="card-surface">

@@ -66,6 +66,8 @@ model Socio {
   consentimientoWhatsApp       Boolean   @default(false)
   consentimientoWhatsAppAt     DateTime?
   consentimientoWhatsAppOrigen String?
+  // El propio socio pidió por WhatsApp no recibir mensajes (409 BAJA_VOLUNTARIA del servicio): FitHub no puede reactivarlo.
+  bajaVoluntariaWhatsApp       Boolean   @default(false)
   recordatorioPospuestoHasta   DateTime?
   activo    Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -74,6 +76,7 @@ model Socio {
   asistencias Asistencia[]
   facturas    Factura[]
   contactos   ContactoSocio[]
+  enviosWhatsApp EnvioWhatsApp[]
 
   @@unique([tipoDocumento, numeroDocumento])
   @@index([nombre])
@@ -138,6 +141,46 @@ model ContactoSocio {
   creadoAt  DateTime       @default(now())
 
   @@index([socioId, creadoAt])
+}
+
+// ---------------------------------------------------------------------------
+// Avisos por WhatsApp (servicio de notificaciones): registro propio para auditar y no repetir llamadas
+// ---------------------------------------------------------------------------
+
+enum TipoAvisoWhatsApp {
+  BIENVENIDA
+  COMPROBANTE
+  D3
+  D0
+}
+
+enum EstadoEnvioWhatsApp {
+  PENDIENTE // aún no resuelto (error transitorio): se reintenta con la misma referencia
+  ENVIADO // aceptado por Meta (no significa entregado)
+  FALLIDO // rechazado: no se reintenta con la misma referencia
+  SIN_CONSENTIMIENTO // 422: decisión del socio
+}
+
+model EnvioWhatsApp {
+  id                String              @id @default(uuid())
+  socio             Socio               @relation(fields: [socioId], references: [id])
+  socioId           String
+  membresiaId       String?
+  facturaId         String?
+  tipo              TipoAvisoWhatsApp
+  // {idMembresía}:{fechaVencimiento aaaa-mm-dd}:{tipo}; única junto con el tópico en el servicio.
+  referenciaExterna String              @unique
+  estado            EstadoEnvioWhatsApp @default(PENDIENTE)
+  // Lo necesario para rearmar la llamada en un reintento (el PDF se vuelve a firmar).
+  solicitud         Json
+  envioId           String?
+  intentos          Int                 @default(0)
+  error             String?
+  creadoAt          DateTime            @default(now())
+  actualizadoAt     DateTime            @updatedAt
+
+  @@index([socioId, creadoAt])
+  @@index([estado])
 }
 
 // ---------------------------------------------------------------------------

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireApiAuth } from '@/lib/api-auth'
 import { obtenerConfiguracion } from '@/lib/config'
 import { estadoMembresia, situacionSocio } from '@/lib/membresias'
+import { sincronizarConsentimiento } from '@/lib/avisosWhatsApp'
 import { leerSocio } from '@/lib/socios'
 import { urlFirmada } from '@/lib/storage'
 
@@ -20,6 +21,7 @@ export async function GET(_req: Request, { params }: Ctx) {
       where: { id: params.id },
       include: {
         membresias: { include: { plan: true, factura: { select: { id: true, tipo: true, numeracionComprobante: true, enviado: true } } }, orderBy: { fechaInicio: 'desc' } },
+        enviosWhatsApp: { orderBy: { creadoAt: 'desc' }, take: 8, select: { id: true, tipo: true, estado: true, error: true, creadoAt: true } },
         asistencias: { where: { validacion: { not: 'ANULADA' } }, orderBy: { fechaHora: 'desc' }, take: 30 },
       },
     }),
@@ -58,16 +60,27 @@ export async function PATCH(req: Request, { params }: Ctx) {
     if (otro && otro.id !== actual.id) return NextResponse.json({ error: `Ya existe un socio con ese documento: ${otro.nombre}` }, { status: 409 })
   }
 
+  // Quien se dio de baja por WhatsApp no puede reactivarse desde FitHub.
+  const aceptar = consentimientoWhatsApp && !actual.bajaVoluntariaWhatsApp
+  const cambioConsentimiento = aceptar !== actual.consentimientoWhatsApp
   const socio = await prisma.socio.update({
     where: { id: params.id },
     data: {
       ...datos,
-      consentimientoWhatsApp,
+      consentimientoWhatsApp: aceptar,
       // La fecha y el origen del consentimiento solo cambian cuando el valor cambia.
-      ...(consentimientoWhatsApp !== actual.consentimientoWhatsApp
-        ? { consentimientoWhatsAppAt: new Date(), consentimientoWhatsAppOrigen: consentimientoWhatsApp ? 'EDICION_RECEPCION' : 'REVOCADO_RECEPCION' }
+      ...(cambioConsentimiento
+        ? { consentimientoWhatsAppAt: new Date(), consentimientoWhatsAppOrigen: aceptar ? 'EDICION_RECEPCION' : 'REVOCADO_RECEPCION' }
         : {}),
     },
   })
-  return NextResponse.json(socio)
+
+  // Informar al servicio: cuando cambia el consentimiento, o cuando cambia el celular de quien ya aceptó.
+  let sincronizacion: Awaited<ReturnType<typeof sincronizarConsentimiento>> = 'OMITIDO'
+  if (aceptar && (cambioConsentimiento || socio.celular !== actual.celular)) {
+    sincronizacion = await sincronizarConsentimiento(socio.id, socio.celular, true, 'edicion-recepcion')
+  } else if (!aceptar && cambioConsentimiento) {
+    sincronizacion = await sincronizarConsentimiento(socio.id, socio.celular ?? actual.celular, false, 'revocado-recepcion')
+  }
+  return NextResponse.json({ ...socio, ...(sincronizacion === 'BAJA_VOLUNTARIA' ? { consentimientoWhatsApp: false, bajaVoluntariaWhatsApp: true } : {}), whatsappSincronizado: sincronizacion })
 }
