@@ -76,7 +76,11 @@ export async function enviarAviso(s: SolicitudEnvio): Promise<ResultadoEnvio> {
   }
   try {
     const { status, json } = await llamar('POST', '/v1/envios', cuerpo)
-    if (status === 200) return { tipo: 'ENVIADO', envioId: typeof json.envioId === 'string' ? json.envioId : null }
+    // 200 es lo documentado; el servicio también responde 202 al aceptar el envío. Un 2xx con estado FALLIDO es un rechazo.
+    if (status >= 200 && status < 300) {
+      if (json.estado === 'FALLIDO') return { tipo: 'FALLIDO', error: `${status} ${texto(json.error)}`.trim() }
+      return { tipo: 'ENVIADO', envioId: typeof json.envioId === 'string' ? json.envioId : null }
+    }
     if (status === 422 && json.error === 'SIN_CONSENTIMIENTO') return { tipo: 'SIN_CONSENTIMIENTO' }
     // 400 es un error de código, 502 un rechazo de Meta y 401/403 persistente es de configuración: ninguno se arregla reintentando.
     if (status === 400 || status === 502 || status === 422 || status === 401 || status === 403) return { tipo: 'FALLIDO', error: `${status} ${texto(json.error)}`.trim() }

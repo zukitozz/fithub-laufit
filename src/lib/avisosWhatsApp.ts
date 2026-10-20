@@ -106,13 +106,15 @@ interface Registro {
   fechaFin: Date
   solicitud: Omit<SolicitudGuardada, 'topicoCodigo'>
   maxIntentos: number
+  /** Para reenviar a propósito (p. ej. ':r2'): otra referencia, otro envío. */
+  sufijoReferencia?: string
 }
 
 /** `{idMembresía}:{fechaVencimiento aaaa-mm-dd}:{tipo}`: así el job diario puede correr varias veces sin duplicar. */
-const referencia = (membresiaId: string, fechaFin: Date, tipo: TipoAvisoWhatsApp) => `${membresiaId}:${textoFecha(fechaFin)}:${tipo}`
+const referencia = (membresiaId: string, fechaFin: Date, tipo: TipoAvisoWhatsApp, sufijo = '') => `${membresiaId}:${textoFecha(fechaFin)}:${tipo}${sufijo}`
 
 async function registrarYEnviar(r: Registro): Promise<EnvioWhatsApp> {
-  const referenciaExterna = referencia(r.membresiaId, r.fechaFin, r.tipo)
+  const referenciaExterna = referencia(r.membresiaId, r.fechaFin, r.tipo, r.sufijoReferencia)
   const solicitud = { topicoCodigo: TOPICO[r.tipo], ...r.solicitud } as unknown as Prisma.InputJsonValue
   const envio = await prisma.envioWhatsApp.upsert({
     where: { referenciaExterna },
@@ -196,7 +198,7 @@ export async function avisarComprobante(membresiaId: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// Tarea diaria (08:00 Lima)
+// Tarea diaria (09:00 Lima)
 // ---------------------------------------------------------------------------
 
 export interface ResumenAvisos {
@@ -238,6 +240,12 @@ export async function ejecutarAvisosVencimiento(): Promise<ResumenAvisos> {
     if (sinTiempo()) break
     const socio = await prisma.socio.findUnique({ where: { id: p.socioId } })
     if (!socio || !socioAvisable(socio)) continue
+    // Una venta anulada ya no merece su aviso.
+    const membresia = p.membresiaId ? await prisma.membresia.findUnique({ where: { id: p.membresiaId }, select: { anulada: true } }) : null
+    if (membresia?.anulada) {
+      await prisma.envioWhatsApp.update({ where: { id: p.id }, data: { estado: 'FALLIDO', error: 'Membresía anulada antes de enviar' } })
+      continue
+    }
     contar(await despachar(p, ESPERAS_MS.length + 1))
     resumen.reintentados++
   }
@@ -315,4 +323,47 @@ export async function sincronizarConsentimiento(socioId: string, telefono: strin
   }
   console.error('[whatsapp] consentimiento', socioId, r.error)
   return 'ERROR'
+}
+
+// ---------------------------------------------------------------------------
+// Simulación (solo pruebas: retirar antes de pasar a producción)
+// ---------------------------------------------------------------------------
+
+export type ResultadoSimulacion = { ok: true; estado: string; error: string | null } | { ok: false; error: string }
+
+/**
+ * Manda ahora el aviso "vence en 3 días" (D3) o "vence hoy" (D0) con los datos de la última membresía del socio, sin
+ * esperar a que corresponda por fecha. Cada simulación usa una referencia nueva, así que siempre envía.
+ */
+export async function simularAvisoVencimiento(socioId: string, tipo: 'D3' | 'D0'): Promise<ResultadoSimulacion> {
+  if (!(await avisosActivos())) return { ok: false, error: 'WhatsApp está desactivado en Ajustes o el servicio no está configurado' }
+  const socio = await prisma.socio.findUnique({ where: { id: socioId } })
+  if (!socio) return { ok: false, error: 'Socio no encontrado' }
+  if (socio.bajaVoluntariaWhatsApp) return { ok: false, error: 'El socio pidió no recibir mensajes' }
+  if (!socioAvisable(socio)) return { ok: false, error: 'El socio no tiene celular o no aceptó recibir WhatsApp' }
+  const m = await prisma.membresia.findFirst({ where: { socioId, anulada: false }, orderBy: { fechaFin: 'desc' }, include: { plan: true } })
+  if (!m) return { ok: false, error: 'El socio no tiene una membresía para simular' }
+
+  // El servicio exige el consentimiento para estos avisos: se le informa antes de enviar.
+  const consentimiento = await sincronizarConsentimiento(socio.id, socio.celular, true, 'simulacion-recepcion')
+  if (consentimiento === 'BAJA_VOLUNTARIA') return { ok: false, error: 'El socio pidió no recibir mensajes' }
+
+  const nombre = primerNombre(socio.nombre)
+  const plan = variable(m.plan.nombre)
+  const negocio = await negocioNombre()
+  const envio = await registrarYEnviar({
+    socioId,
+    membresiaId: m.id,
+    tipo,
+    fechaFin: m.fechaFin,
+    maxIntentos: 1,
+    sufijoReferencia: `:sim${Date.now()}`,
+    solicitud: {
+      telefono: socio.celular,
+      // Sin el enlace acordado del gimnasio se usa el de ejemplo del spec.
+      botonUrlSufijo: process.env.NOTIF_PROMOS_SLUG || 'fithub-demo',
+      variables: tipo === 'D3' ? { nombre, plan, negocio, fecha_vencimiento: fechaDMA(m.fechaFin) } : { nombre, plan, negocio },
+    },
+  })
+  return { ok: true, estado: envio.estado, error: envio.error }
 }

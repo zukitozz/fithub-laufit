@@ -4,7 +4,7 @@ import { ejecutarAvisosVencimiento } from '@/lib/avisosWhatsApp'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
-// Tarea diaria (Vercel Cron, 08:00 de Lima = 13:00 UTC): avisa por WhatsApp a quienes vencen en 3 días y hoy.
+// Tarea diaria (Vercel Cron, 09:00 de Lima = 14:00 UTC): avisa por WhatsApp a quienes vencen en 3 días y hoy.
 // Solo se ejecuta con `Authorization: Bearer $CRON_SECRET`. Se puede lanzar a mano varias veces el mismo día sin duplicar avisos.
 async function ejecutar(req: Request) {
   const secreto = process.env.CRON_SECRET

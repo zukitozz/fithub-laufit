@@ -61,6 +61,7 @@ export default function SocioPage() {
   const [contactando, setContactando] = useState(false)
   const [editando, setEditando] = useState(false)
   const [venta, setVenta] = useState(false)
+  const [simulando, setSimulando] = useState<'D3' | 'D0' | null>(null)
   const [anulando, setAnulando] = useState<string | null>(null)
   const [motivo, setMotivo] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -88,6 +89,17 @@ export default function SocioPage() {
     fotoUrl: data.fotoUrl,
   }
 
+  // SOLO PRUEBAS: retirar junto con /api/socios/[id]/simular-aviso antes de pasar a producción.
+  async function simular(tipo: 'D3' | 'D0') {
+    setSimulando(tipo)
+    const r = await api<{ estado: string; error: string | null }>(`/api/socios/${id}/simular-aviso`, { method: 'POST', body: { tipo } })
+    setSimulando(null)
+    if (!r.ok) return toast.error(r.error)
+    if (r.data.estado === 'ENVIADO') toast.success('Aviso enviado. Revisa el WhatsApp del socio.')
+    else toast.error(`El aviso no salió (${r.data.estado}${r.data.error ? `: ${r.data.error}` : ''})`)
+    void mutate()
+  }
+
   async function anular(e: React.FormEvent) {
     e.preventDefault()
     setEnviando(true)
@@ -111,7 +123,16 @@ export default function SocioPage() {
           <p className="mt-1 text-sm text-ink-500">{data.tipoDocumento} {data.numeroDocumento}{data.celular && <> · {data.celular}</>}{data.email && <> · {data.email}</>}</p>
           <p className="mt-2 flex items-center gap-2"><EstadoBadge estado={data.estado} /> <span className="text-sm text-ink-600">{data.estado === 'SIN_MEMBRESIA' ? '' : `${textoDias(data.diasRestantes)} · vence ${fechaCorta(data.fechaFin)}`}</span></p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {esGerente && (
+            <div className="rounded-xl border border-dashed border-ink-300 px-3 py-2">
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-ink-400">Solo pruebas · retirar antes de producción</p>
+              <div className="flex gap-2">
+                <button type="button" disabled={simulando !== null} onClick={() => void simular('D3')} className="btn-ghost btn-sm">{simulando === 'D3' && <Spinner />} Simular vencimiento de 3 días</button>
+                <button type="button" disabled={simulando !== null} onClick={() => void simular('D0')} className="btn-ghost btn-sm">{simulando === 'D0' && <Spinner />} Simular vence hoy</button>
+              </div>
+            </div>
+          )}
           <button type="button" onClick={() => setEditando(true)} className="btn-ghost"><Pencil size={16} /> Editar</button>
           <button type="button" onClick={() => setVenta(true)} className="btn-brand">{data.estado === 'SIN_MEMBRESIA' ? 'Vender membresía' : 'Renovar'}</button>
         </div>
