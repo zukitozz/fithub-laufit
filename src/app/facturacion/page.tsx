@@ -60,7 +60,7 @@ export default function FacturacionPage() {
       <header className="mb-5">
         <p className="eyebrow">SUNAT</p>
         <h1 className="page-heading text-4xl">Facturación</h1>
-        <p className="text-sm text-ink-500">Los comprobantes se envían a SUNAT al emitirse. Los pendientes se reintentan solos cada noche, junto con el resumen diario de boletas (00:00).</p>
+        <p className="text-sm text-ink-500">Los comprobantes se envían a SUNAT al emitirse. Los pendientes se reintentan solos cada noche; el resumen diario de boletas lo envía el facturador a las 00:10.</p>
       </header>
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -103,7 +103,7 @@ export default function FacturacionPage() {
           </tbody>
         </table>
       </div>
-      <p className="mt-3 text-xs text-ink-400">Se muestran los últimos 100. Las boletas quedan “generadas” y se informan a SUNAT en el resumen diario. Las notas de despacho son internas y no se envían.</p>
+      <p className="mt-3 text-xs text-ink-400">Se muestran los últimos 100. Las boletas quedan “generadas” y el facturador las informa a SUNAT en su resumen diario. Las notas de despacho son internas y no se envían.</p>
     </div>
   )
 }

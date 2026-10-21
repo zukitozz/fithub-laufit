@@ -74,7 +74,7 @@ export interface ResultadoFacturador {
   cdr: string | null
 }
 
-// aceptado*/enviado: SUNAT lo tiene. generado: boleta firmada, va en el resumen diario.
+// aceptado*/enviado: SUNAT lo tiene. generado: boleta firmada; el facturador la declara solo en su resumen de las 00:10 (Lima).
 // pendiente/validando: en proceso en SUNAT; reenviar solo duplicaría el trámite.
 const ESTADOS_EXITO = new Set(['aceptado', 'aceptado_con_observaciones', 'enviado', 'generado', 'pendiente', 'validando'])
 
@@ -162,7 +162,7 @@ export async function enviarComprobante(factura: FacturaParaEnvio): Promise<Resu
     })
   } catch {
     // Timeout o corte de red: no asumir que falló. Si el comprobante existe, usar su estado;
-    // si no existe (404) no llegó y se puede reenviar con el mismo número.
+    // si no existe (404) no llegó (para una boleta, 404 = el facturador nunca la vio) y se reenvía con el mismo número.
     const consulta = await fetch(`${raiz}/${codigo}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(TIMEOUT_MS) }).catch(() => null)
     if (consulta?.ok) {
       const data = await consulta.json()
@@ -179,22 +179,9 @@ export async function enviarComprobante(factura: FacturaParaEnvio): Promise<Resu
   return interpretar(data)
 }
 
-/** Informa a SUNAT las boletas de días anteriores. Seguro llamarlo de más. */
-export async function enviarResumenDiario(): Promise<unknown> {
-  const { baseUrl, ruc } = configuracionApi()
-  const response = await fetch(`${baseUrl}/empresas/${ruc}/resumenes-diarios`, {
-    method: 'POST',
-    headers: { Accept: 'application/json' },
-    signal: AbortSignal.timeout(TIMEOUT_MS),
-  })
-  const data = await response.json().catch(() => null)
-  if (!response.ok) throw new Error(mensajeHttp(response.status, data))
-  return data
-}
-
 /**
  * CDR de un comprobante ya enviado, o null si SUNAT aún no lo entrega. Las boletas no tienen
- * CDR propio (es el del resumen diario), así que solo aplica a facturas y notas.
+ * CDR propio (es el del resumen, que el facturador envía solo), así que solo aplica a facturas y notas.
  */
 export async function obtenerCdr(tipoComprobante: string, numeracion: string): Promise<string | null> {
   const { baseUrl, ruc } = configuracionApi()

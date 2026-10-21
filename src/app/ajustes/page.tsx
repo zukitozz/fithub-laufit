@@ -120,7 +120,7 @@ export default function AjustesPage() {
               <Campo id="ub" titulo="Ubigeo" valor={form.codigoUbigeo ?? ''} onChange={(v) => set('codigoUbigeo', v)} />
             </div>
             <p className="mt-3 rounded-xl bg-ink-50 px-4 py-3 text-sm text-ink-600">
-              Los comprobantes se envían a SUNAT <strong>automáticamente al emitirse</strong>. Si el envío falla, se reintenta solo cada noche, y el resumen diario de boletas sale a las 00:00 de Lima. No hay envío manual.
+              Los comprobantes se envían a SUNAT <strong>automáticamente al emitirse</strong>. Si el envío falla, se reintenta solo cada noche, y el facturador envía el resumen diario de boletas a las 00:10 de Lima. No hay envío manual.
             </p>
           </div>
 

@@ -51,7 +51,7 @@ Entra a http://localhost:3000 con `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Luego, en **
 1. Base PostgreSQL (RDS u otra) y `DATABASE_URL`. Aplicar `npx prisma migrate deploy` y `npm run seed`.
 2. Proyecto en Vercel con las variables de `.env.example` (sin `ADMIN_*` salvo para el seed). `APP_URL` debe ser el dominio público: es la base de la URL que lleva el QR.
 3. Bucket S3 **privado** y usuario IAM con solo `s3:PutObject`/`s3:GetObject` (fotos de socios).
-4. `CRON_SECRET` (obligatorio): Vercel Cron llama a `/api/facturacion/resumen-diario` cada día a las 00:00 de Lima (05:00 UTC, `0 5 * * *`) y la ruta solo acepta ese secreto. Esa tarea reenvía los comprobantes que no llegaron al facturador, informa las boletas (resumen diario) y baja los CDR.
+4. `CRON_SECRET` (obligatorio): Vercel Cron llama a `/api/facturacion/resumen-diario` cada día a las 00:00 de Lima (05:00 UTC, `0 5 * * *`) y la ruta solo acepta ese secreto. Esa tarea reenvía los comprobantes que no llegaron al facturador, y baja los CDR. El resumen diario de boletas lo envía el propio facturador a las 00:10 (Lima); FitHub ya no lo llama.
 5. Los comprobantes se envían a SUNAT al emitirse, así que antes de vender en producción el RUC debe estar dado de alta en el facturador y las series habilitadas en SUNAT. El RUC se toma de Ajustes y `FACTURADOR_RUC_EMISOR` (deben coincidir).
 
 ## Notas importantes

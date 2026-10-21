@@ -1,5 +1,7 @@
 # Especificación: consumir facturador-api
 
+> **Actualización (2026-10-20):** el facturador ahora envía solo el resumen diario de boletas (00:10 Lima), cierra el ticket de SUNAT, reintenta los fallos transitorios y anula a los 7 días. FitHub **ya no llama** a `POST /resumenes-diarios`. Una boleta ya declarada responde con el estado de su resumen (ya no `404`; `404` = nunca la recibió). Nuevos: `GET /resumenes`, `GET /reintentos?estado=manual|anulado`. Pendiente: autenticación del servicio (por definir). El detalle completo está en la especificación vigente del servicio.
+
 Servicio REST para emitir comprobantes electrónicos de SUNAT (factura, boleta, nota de crédito, nota de débito) y consultar su estado.
 
 - **URL base:** `https://facturador.peru-hub.com` (Swagger en `/docs`)

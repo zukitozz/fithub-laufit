@@ -11,7 +11,7 @@ export async function enviarFacturaASunat(facturaId: string) {
   try {
     const resultado = await enviarComprobante(factura)
     // El CDR puede no venir en el POST (SUNAT aún no responde): se reintenta luego en sincronizarCdrPendientes.
-    // Las boletas no tienen CDR propio (es el del resumen diario).
+    // Las boletas no tienen CDR propio (es el del resumen, que el facturador envía solo).
     const cdr = resultado.cdr ?? (resultado.exito && factura.tipoComprobante !== '03' ? await obtenerCdr(factura.tipoComprobante!, factura.numeracionComprobante!).catch(() => null) : null)
     return prisma.factura.update({
       where: { id: factura.id },
