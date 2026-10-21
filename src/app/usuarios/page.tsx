@@ -50,7 +50,7 @@ export default function UsuariosPage() {
         <button type="button" onClick={() => { setErrorForm(null); setForm({ ...NUEVO }) }} className="btn-brand"><Plus size={18} /> Nuevo usuario</button>
       </header>
 
-      {error && <p role="alert" className="mb-3 text-laufit-700">{String(error.message)}</p>}
+      {error && <p role="alert" className="mb-3 text-danger-700">{String(error.message)}</p>}
       <div className="card-surface overflow-x-auto p-0">
         <table className="w-full min-w-[560px]">
           <thead className="border-b border-ink-100"><tr><th className="th">Nombre</th><th className="th">Correo</th><th className="th">Rol</th><th className="th">Estado</th><th className="th">Creado</th><th className="th" /></tr></thead>
@@ -60,7 +60,7 @@ export default function UsuariosPage() {
               <tr key={u.id} className={u.activo ? '' : 'opacity-50'}>
                 <td className="td font-semibold">{u.name}</td>
                 <td className="td">{u.email}</td>
-                <td className="td"><span className={`badge ${u.role === 'SUPERVISOR' ? 'bg-laufit-100 text-laufit-800' : 'bg-ink-100 text-ink-700'}`}>{ROLE_LABELS[u.role]}</span></td>
+                <td className="td"><span className={`badge ${u.role === 'SUPERVISOR' ? 'bg-brand-100 text-brand-800' : 'bg-ink-100 text-ink-700'}`}>{ROLE_LABELS[u.role]}</span></td>
                 <td className="td">{u.activo ? 'Activo' : 'Inactivo'}</td>
                 <td className="td text-ink-500">{fechaCorta(u.createdAt)}</td>
                 <td className="td text-right">
@@ -93,10 +93,10 @@ export default function UsuariosPage() {
             </div>
             {form.id && (
               <label className="flex items-center gap-3 text-sm">
-                <input type="checkbox" checked={form.activo} onChange={(e) => setForm({ ...form, activo: e.target.checked })} className="h-5 w-5 accent-laufit-600" /> Usuario activo (puede iniciar sesión)
+                <input type="checkbox" checked={form.activo} onChange={(e) => setForm({ ...form, activo: e.target.checked })} className="h-5 w-5 accent-brand-600" /> Usuario activo (puede iniciar sesión)
               </label>
             )}
-            {errorForm && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{errorForm}</p>}
+            {errorForm && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{errorForm}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setForm(null)} className="btn-ghost">Cancelar</button>
               <button type="submit" disabled={enviando} className="btn-brand">{enviando && <Spinner />} Guardar</button>

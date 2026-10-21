@@ -20,9 +20,9 @@ interface Resumen {
 
 function Indicador({ titulo, valor, detalle, href, alerta }: { titulo: string; valor: string | number; detalle?: string; href?: string; alerta?: boolean }) {
   const cuerpo = (
-    <div className={`card-surface h-full transition ${href ? 'hover:-translate-y-0.5' : ''} ${alerta ? 'border-laufit-300 bg-laufit-50' : ''}`}>
+    <div className={`card-surface h-full transition ${href ? 'hover:-translate-y-0.5' : ''} ${alerta ? 'border-danger-300 bg-danger-50' : ''}`}>
       <p className="text-xs font-bold uppercase tracking-wide text-ink-500">{titulo}</p>
-      <p className={`mt-1 font-display text-5xl font-extrabold leading-none ${alerta ? 'text-laufit-600' : 'text-ink-900'}`}>{valor}</p>
+      <p className={`mt-1 font-display text-5xl font-extrabold leading-none ${alerta ? 'text-danger-600' : 'text-ink-900'}`}>{valor}</p>
       {detalle && <p className="mt-2 text-xs text-ink-400">{detalle}</p>}
     </div>
   )
@@ -39,7 +39,7 @@ export default function DashboardPage() {
         <h1 className="page-heading text-4xl">Dashboard</h1>
       </header>
 
-      {error && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{String(error.message)}</p>}
+      {error && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{String(error.message)}</p>}
       {!data && !error && <p className="text-ink-500"><Spinner /> Cargando…</p>}
 
       {data && (
@@ -55,13 +55,13 @@ export default function DashboardPage() {
           </div>
 
           <section className="card-surface mt-6">
-            <h2 className="flex items-center gap-2 font-display text-2xl font-bold"><Cake size={20} className="text-laufit-600" /> <Link href="/cumpleanos" className="hover:text-laufit-600">Cumpleaños de hoy</Link></h2>
+            <h2 className="flex items-center gap-2 font-display text-2xl font-bold"><Cake size={20} className="text-brand-600" /> <Link href="/cumpleanos" className="hover:text-brand-600">Cumpleaños de hoy</Link></h2>
             {data.cumpleanosHoy.length === 0 ? (
               <p className="mt-2 text-sm text-ink-500">Nadie cumple años hoy.</p>
             ) : (
               <ul className="mt-2 flex flex-wrap gap-2">
                 {data.cumpleanosHoy.map((c) => (
-                  <li key={c.id}><Link href={`/socios/${c.id}`} className="badge bg-laufit-100 text-laufit-800 hover:bg-laufit-200">{c.nombre}</Link></li>
+                  <li key={c.id}><Link href={`/socios/${c.id}`} className="badge bg-brand-100 text-brand-800 hover:bg-brand-200">{c.nombre}</Link></li>
                 ))}
               </ul>
             )}

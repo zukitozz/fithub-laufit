@@ -1,7 +1,30 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { obtenerTenant } from '../src/lib/tenant'
 
 const prisma = new PrismaClient()
+const tenant = obtenerTenant(process.env.TENANT)
+
+// Datos del emisor por cliente. Los de la demostración son ficticios: no emitir comprobantes reales con ellos.
+const EMISORES: Record<string, { direccion: string; telefonoContacto: string; ruc: string; razonSocial: string; direccionFiscal: string; codigoUbigeo: string }> = {
+  laufit: {
+    direccion: 'Av. Próceres de Huandoy 7585, Los Olivos',
+    telefonoContacto: '974775549',
+    ruc: '20563019337',
+    razonSocial: 'THE1 FITNESS CLUB CENTER S.A.C.',
+    direccionFiscal: 'AV. LOS PROCERES MZ TT2 LT 6 URB. PRO 5TO SECTOR I ETAPA FRENTE A COLEGIO DE JESUS, LOS OLIVOS - LIMA - LIMA',
+    codigoUbigeo: '150117',
+  },
+  fitfactory: {
+    direccion: 'Dirección de demostración, Lima',
+    telefonoContacto: '999999999',
+    ruc: '20000000001',
+    razonSocial: tenant.razonSocial,
+    direccionFiscal: 'DIRECCIÓN DE DEMOSTRACIÓN - LIMA - LIMA',
+    codigoUbigeo: '150101',
+  },
+}
+const emisor = EMISORES[tenant.id] ?? EMISORES.laufit
 
 // Planes del afiche de LAUFIT (precios con IGV). Se pueden editar después en /planes.
 const PLANES = [
@@ -47,13 +70,8 @@ async function main() {
     update: {},
     create: {
       id: 'default',
-      nombreGimnasio: 'LAUFIT Fitness Club',
-      direccion: 'Av. Próceres de Huandoy 7585, Los Olivos',
-      telefonoContacto: '974775549',
-      ruc: '20563019337',
-      razonSocial: 'THE1 FITNESS CLUB CENTER S.A.C.',
-      direccionFiscal: 'AV. LOS PROCERES MZ TT2 LT 6 URB. PRO 5TO SECTOR I ETAPA FRENTE A COLEGIO DE JESUS, LOS OLIVOS - LIMA - LIMA',
-      codigoUbigeo: '150117',
+      nombreGimnasio: tenant.nombre,
+      ...emisor,
       horarioAtencion: HORARIO,
     },
   })

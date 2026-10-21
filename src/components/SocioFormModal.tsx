@@ -167,12 +167,12 @@ export function SocioFormModal({ inicial, onClose, onGuardado }: Props) {
           <p className="rounded-xl bg-ink-50 px-4 py-3 text-sm text-ink-600">El socio pidió por WhatsApp no recibir mensajes. No se le puede reactivar desde aquí.</p>
         ) : (
           <label className="flex items-start gap-3 rounded-xl bg-ink-50 px-4 py-3 text-sm">
-            <input type="checkbox" checked={form.consentimientoWhatsApp} onChange={(e) => set('consentimientoWhatsApp', e.target.checked)} className="mt-0.5 h-5 w-5 accent-laufit-600" />
+            <input type="checkbox" checked={form.consentimientoWhatsApp} onChange={(e) => set('consentimientoWhatsApp', e.target.checked)} className="mt-0.5 h-5 w-5 accent-brand-600" />
             <span>El socio acepta recibir su comprobante y avisos de vencimiento por WhatsApp.</span>
           </label>
         )}
 
-        {error && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{error}</p>}
+        {error && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{error}</p>}
 
         <div className="flex justify-end gap-2">
           <button type="button" onClick={onClose} className="btn-ghost">Cancelar</button>

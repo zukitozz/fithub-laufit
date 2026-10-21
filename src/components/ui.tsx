@@ -27,7 +27,7 @@ export async function api<T = unknown>(url: string, opciones?: { method?: string
 const ESTADOS: Record<string, { texto: string; clase: string }> = {
   VIGENTE: { texto: 'Vigente', clase: 'bg-emerald-100 text-emerald-800' },
   POR_VENCER: { texto: 'Por vencer', clase: 'bg-amber-100 text-amber-800' },
-  VENCIDA: { texto: 'Vencida', clase: 'bg-laufit-100 text-laufit-800' },
+  VENCIDA: { texto: 'Vencida', clase: 'bg-danger-100 text-danger-800' },
   PROGRAMADA: { texto: 'Programada', clase: 'bg-sky-100 text-sky-800' },
   ANULADA: { texto: 'Anulada', clase: 'bg-ink-100 text-ink-500' },
   SIN_MEMBRESIA: { texto: 'Sin membresía', clase: 'bg-ink-100 text-ink-600' },

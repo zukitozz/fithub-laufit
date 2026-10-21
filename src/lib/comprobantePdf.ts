@@ -1,6 +1,7 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
 import QRCode from 'qrcode'
-import { LOGO_PNG_BASE64 } from '@/lib/logoPdf'
+import { logoPngBase64 } from '@/lib/logoPdf'
+import { obtenerTenant } from '@/lib/tenant'
 import { fechaPeru } from '@/lib/fechas'
 
 const IGV_PORCENTAJE = Number(process.env.IGV_PORCENTAJE || '18')
@@ -128,7 +129,7 @@ export async function generarPdfComprobante(d: ComprobantePdfDatos, emisor: Emis
 
   // ── Cabecera ────────────────────────────────────────────────────────────────
   let y = H - M
-  const logo = await pdf.embedPng(Buffer.from(LOGO_PNG_BASE64, 'base64'))
+  const logo = await pdf.embedPng(Buffer.from(logoPngBase64(obtenerTenant().id), 'base64'))
   page.drawImage(logo, { x: M, y: y - 72, width: 72, height: 72 })
 
   const cajaW = 212

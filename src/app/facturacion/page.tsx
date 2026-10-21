@@ -31,8 +31,8 @@ function EstadoSunat({ f }: { readonly f: Fila }) {
   if (f.estadoFacturador === 'rechazado') {
     return (
       <>
-        <span className="badge bg-laufit-100 text-laufit-800">Rechazado por SUNAT</span>
-        {f.errors && <span className="mt-1 block max-w-xs text-xs text-laufit-700">{f.errors}</span>}
+        <span className="badge bg-danger-100 text-danger-800">Rechazado por SUNAT</span>
+        {f.errors && <span className="mt-1 block max-w-xs text-xs text-danger-700">{f.errors}</span>}
       </>
     )
   }
@@ -79,7 +79,7 @@ export default function FacturacionPage() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar nombre, documento o número" aria-label="Buscar" className="field w-72" />
       </div>
 
-      {error && <p role="alert" className="mb-3 rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{String(error.message)}</p>}
+      {error && <p role="alert" className="mb-3 rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{String(error.message)}</p>}
 
       <div className="card-surface overflow-x-auto p-0">
         <table className="w-full min-w-[760px]">

@@ -97,7 +97,7 @@ export default function ProductosPage() {
           <p className="eyebrow">Market</p>
           <h1 className="page-heading text-4xl">Productos</h1>
           <p className="text-sm text-ink-500">
-            Precios con IGV incluido.{bajos > 0 && <strong className="ml-1 text-laufit-600">{bajos} con stock bajo.</strong>}
+            Precios con IGV incluido.{bajos > 0 && <strong className="ml-1 text-danger-600">{bajos} con stock bajo.</strong>}
           </p>
         </div>
         <button type="button" onClick={() => { setErrorForm(null); setForm({ ...NUEVO }) }} className="btn-brand"><Plus size={18} /> Nuevo producto</button>
@@ -108,7 +108,7 @@ export default function ProductosPage() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre, categoría o código" aria-label="Buscar producto" className="field pl-10" />
       </div>
 
-      {error && <p role="alert" className="mb-3 text-laufit-700">{String(error.message)}</p>}
+      {error && <p role="alert" className="mb-3 text-danger-700">{String(error.message)}</p>}
       <div className="card-surface overflow-x-auto p-0">
         <table className="w-full min-w-[720px]">
           <thead className="border-b border-ink-100"><tr><th className="th">Producto</th><th className="th">Categoría</th><th className="th">Precio</th><th className="th">Costo</th><th className="th">Stock</th><th className="th" /></tr></thead>
@@ -125,7 +125,7 @@ export default function ProductosPage() {
                   <td className="td text-ink-500">{p.precioCosto === null ? '—' : soles(p.precioCosto)}</td>
                   <td className="td">
                     {p.controlaStock ? (
-                      <span className={`badge ${agotado ? 'bg-laufit-100 text-laufit-800' : bajo ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>{agotado ? 'Agotado' : `${p.stock} u.`}</span>
+                      <span className={`badge ${agotado ? 'bg-danger-100 text-danger-800' : bajo ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>{agotado ? 'Agotado' : `${p.stock} u.`}</span>
                     ) : (
                       <span className="text-xs text-ink-400">Sin control</span>
                     )}
@@ -192,9 +192,9 @@ export default function ProductosPage() {
                 <input id="pa" type="number" min={0} step={1} value={form.alertaStock} onChange={(e) => setForm({ ...form, alertaStock: e.target.value })} className="field" />
               </div>
             </div>
-            <label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={form.controlaStock} onChange={(e) => setForm({ ...form, controlaStock: e.target.checked })} className="h-5 w-5 accent-laufit-600" /> Controlar stock (se descuenta al vender)</label>
-            <label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={form.activo} onChange={(e) => setForm({ ...form, activo: e.target.checked })} className="h-5 w-5 accent-laufit-600" /> Activo (aparece en el Market)</label>
-            {errorForm && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{errorForm}</p>}
+            <label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={form.controlaStock} onChange={(e) => setForm({ ...form, controlaStock: e.target.checked })} className="h-5 w-5 accent-brand-600" /> Controlar stock (se descuenta al vender)</label>
+            <label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={form.activo} onChange={(e) => setForm({ ...form, activo: e.target.checked })} className="h-5 w-5 accent-brand-600" /> Activo (aparece en el Market)</label>
+            {errorForm && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{errorForm}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setForm(null)} className="btn-ghost">Cancelar</button>
               <button type="submit" disabled={enviando} className="btn-brand">{enviando && <Spinner />} Guardar</button>
@@ -216,7 +216,7 @@ export default function ProductosPage() {
               <label htmlFor="mm" className="label">Motivo (opcional)</label>
               <input id="mm" value={motivo} onChange={(e) => setMotivo(e.target.value)} className="field" placeholder={mov.tipo === 'ENTRADA' ? 'Compra a proveedor…' : 'Conteo de fin de mes…'} />
             </div>
-            {errorForm && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{errorForm}</p>}
+            {errorForm && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{errorForm}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setMov(null)} className="btn-ghost">Cancelar</button>
               <button type="submit" disabled={enviando} className="btn-brand">{enviando && <Spinner />} Guardar</button>

@@ -29,5 +29,5 @@ export default auth((req) => {
 
 // Públicas: /marcar (auto-marcación de socios y coaches), /auth/login, /legal, assets.
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|logo-laufit.png|auth/login|legal|marcar).*)'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|logo-[a-z-]+\.png|auth/login|legal|marcar).*)'],
 }

@@ -23,7 +23,10 @@ import {
   X,
 } from 'lucide-react'
 import { BrandLogo } from '@/components/BrandLogo'
+import { obtenerTenant } from '@/lib/tenant'
 import { ROLE_LABELS, type UserRole } from '@/types/user'
+
+const tenant = obtenerTenant()
 
 const STAFF: UserRole[] = ['ADMIN', 'SUPERVISOR']
 
@@ -81,12 +84,12 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
           collapsed ? 'w-20' : 'w-64'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
       >
-        <div className="flex items-center gap-2 border-b border-laufit-600/40 p-4">
+        <div className="flex items-center gap-2 border-b border-brand-600/40 p-4">
           {!collapsed && (
             <div className="flex items-center gap-3">
               <BrandLogo compact />
               <span className="font-display text-xl font-bold leading-none tracking-wide">
-                LAU<span className="text-laufit-500">FIT</span>
+                {tenant.marca[0]}<span className="text-brand-400">{tenant.marca[1]}</span>
               </span>
             </div>
           )}
@@ -119,7 +122,7 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
                 onClick={onCloseMobile}
                 title={collapsed ? item.label : undefined}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
-                  isActive ? 'bg-laufit-600 font-semibold text-white' : 'text-ink-200 hover:bg-ink-700 hover:text-white'
+                  isActive ? 'bg-brand-600 font-semibold text-white' : 'text-ink-200 hover:bg-ink-700 hover:text-white'
                 }`}
               >
                 <Icon size={20} className="shrink-0" />
@@ -129,9 +132,9 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
           })}
         </nav>
 
-        <div className="border-t border-laufit-600/40 p-3">
+        <div className="border-t border-brand-600/40 p-3">
           <div className={`flex items-center gap-3 rounded-xl px-2 py-2 ${collapsed ? 'justify-center' : ''}`}>
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-laufit-600 text-sm font-bold text-white">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">
               {initials}
             </div>
             {!collapsed && (
@@ -145,7 +148,7 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
             type="button"
             onClick={() => void signOut({ callbackUrl: '/auth/login' })}
             title={collapsed ? 'Salir' : undefined}
-            className={`mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-ink-200 transition hover:bg-laufit-700 hover:text-white ${
+            className={`mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-ink-200 transition hover:bg-brand-700 hover:text-white ${
               collapsed ? 'justify-center' : ''
             }`}
           >

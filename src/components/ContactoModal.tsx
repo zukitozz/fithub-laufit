@@ -78,7 +78,7 @@ export function ContactoModal({ socio, motivo, permitePosponer = false, onClose,
           </div>
         )}
 
-        {error && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{error}</p>}
+        {error && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{error}</p>}
         <div className="flex justify-end gap-2">
           <button type="button" onClick={onClose} className="btn-ghost">Cancelar</button>
           <button type="submit" disabled={enviando || nota.trim().length < 2} className="btn-brand">{enviando && <Spinner />} Guardar contacto</button>

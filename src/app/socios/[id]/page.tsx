@@ -66,7 +66,7 @@ export default function SocioPage() {
   const [motivo, setMotivo] = useState('')
   const [enviando, setEnviando] = useState(false)
 
-  if (error) return <div className="p-8"><p role="alert" className="text-laufit-700">{String(error.message)}</p></div>
+  if (error) return <div className="p-8"><p role="alert" className="text-danger-700">{String(error.message)}</p></div>
   if (!data) return <div className="p-8 text-ink-500"><Spinner /> Cargando…</div>
 
   const esGerente = session?.user?.role === 'SUPERVISOR'
@@ -114,7 +114,7 @@ export default function SocioPage() {
 
   return (
     <div className="p-4 md:p-8">
-      <Link href="/socios" className="mb-4 inline-flex items-center gap-1 text-sm font-semibold text-ink-500 hover:text-laufit-600"><ArrowLeft size={16} /> Socios</Link>
+      <Link href="/socios" className="mb-4 inline-flex items-center gap-1 text-sm font-semibold text-ink-500 hover:text-brand-600"><ArrowLeft size={16} /> Socios</Link>
 
       <header className="card-surface flex flex-wrap items-center gap-5">
         <Avatar nombre={data.nombre} url={data.fotoUrl} className="h-24 w-24 text-3xl" />
@@ -150,7 +150,7 @@ export default function SocioPage() {
                     <td className="td font-semibold">{m.plan.nombre}<span className="block text-xs font-normal text-ink-400">{soles(m.precio)}</span></td>
                     <td className="td">{fechaCorta(m.fechaInicio)} → {fechaCorta(m.fechaFin)}</td>
                     <td className="td"><EstadoBadge estado={m.estado} />{m.anuladaMotivo && <span className="block text-xs text-ink-400">{m.anuladaMotivo}</span>}</td>
-                    <td className="td text-xs">{m.factura ? <a href={`/api/facturacion/${m.factura.id}/pdf`} target="_blank" rel="noopener noreferrer" className="font-semibold text-laufit-600 underline">{m.factura.numeracionComprobante ?? 'PDF'}</a> : '—'}{m.factura && !m.factura.enviado && m.factura.tipo !== 'NOTA_DESPACHO' && <span className="block text-amber-700">Pendiente en SUNAT</span>}</td>
+                    <td className="td text-xs">{m.factura ? <a href={`/api/facturacion/${m.factura.id}/pdf`} target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-600 underline">{m.factura.numeracionComprobante ?? 'PDF'}</a> : '—'}{m.factura && !m.factura.enviado && m.factura.tipo !== 'NOTA_DESPACHO' && <span className="block text-amber-700">Pendiente en SUNAT</span>}</td>
                     <td className="td text-right">
                       {esGerente && m.estado !== 'ANULADA' && <button type="button" onClick={() => setAnulando(m.id)} className="btn-ghost btn-sm">Anular</button>}
                     </td>

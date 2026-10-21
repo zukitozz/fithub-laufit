@@ -61,7 +61,7 @@ export default function SociosPage() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre, documento o celular" aria-label="Buscar socio" className="field pl-10" />
       </div>
 
-      {error && <p role="alert" className="mb-3 rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{String(error.message)}</p>}
+      {error && <p role="alert" className="mb-3 rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{String(error.message)}</p>}
 
       <div className="card-surface overflow-x-auto p-0">
         <table className="w-full min-w-[640px]">
@@ -82,7 +82,7 @@ export default function SociosPage() {
             {data?.items.map((s) => (
               <tr key={s.id} className="hover:bg-ink-50">
                 <td className="td">
-                  <Link href={`/socios/${s.id}`} className="flex items-center gap-3 font-semibold text-ink-900 hover:text-laufit-600">
+                  <Link href={`/socios/${s.id}`} className="flex items-center gap-3 font-semibold text-ink-900 hover:text-brand-600">
                     <Avatar nombre={s.nombre} url={s.fotoUrl} className="h-10 w-10 text-sm" />
                     {s.nombre}
                   </Link>

@@ -212,7 +212,7 @@ export default function MarketPage() {
           </div>
         )}
 
-        {error && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{String(error.message)}</p>}
+        {error && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{String(error.message)}</p>}
         {!productos && !error && <p className="text-ink-500"><Spinner /> Cargando productos…</p>}
         {productos && productos.length === 0 && (
           <div className="card-surface py-10 text-center text-ink-500">
@@ -233,15 +233,15 @@ export default function MarketPage() {
                 disabled={agotado}
                 onClick={() => agregar(p)}
                 className={`relative flex min-h-[7rem] flex-col justify-between rounded-2xl border-2 bg-white p-3 text-left transition active:scale-[0.98] ${
-                  agotado ? 'cursor-not-allowed border-ink-100 opacity-50' : enCarrito ? 'border-laufit-600 shadow-soft' : 'border-ink-100 hover:border-laufit-300'
+                  agotado ? 'cursor-not-allowed border-ink-100 opacity-50' : enCarrito ? 'border-brand-600 shadow-soft' : 'border-ink-100 hover:border-brand-300'
                 }`}
               >
-                {enCarrito > 0 && <span className="absolute -right-2 -top-2 flex h-7 min-w-7 items-center justify-center rounded-full bg-laufit-600 px-1.5 text-sm font-bold text-white">{enCarrito}</span>}
+                {enCarrito > 0 && <span className="absolute -right-2 -top-2 flex h-7 min-w-7 items-center justify-center rounded-full bg-brand-600 px-1.5 text-sm font-bold text-white">{enCarrito}</span>}
                 <span className="text-sm font-semibold leading-snug text-ink-900">{p.nombre}</span>
                 <span>
-                  <span className="block font-display text-2xl font-bold text-laufit-600">{soles(p.precioVenta)}</span>
+                  <span className="block font-display text-2xl font-bold text-brand-600">{soles(p.precioVenta)}</span>
                   {p.controlaStock && (
-                    <span className={`text-xs font-semibold ${agotado ? 'text-laufit-700' : bajo ? 'text-amber-700' : 'text-ink-400'}`}>
+                    <span className={`text-xs font-semibold ${agotado ? 'text-danger-700' : bajo ? 'text-amber-700' : 'text-ink-400'}`}>
                       {agotado ? 'Agotado' : `${p.stock} en stock`}
                     </span>
                   )}
@@ -257,8 +257,8 @@ export default function MarketPage() {
       <aside aria-label="Carrito" className="lg:sticky lg:top-4 lg:self-start">
         <div className="card-surface space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="flex items-center gap-2 font-display text-2xl font-bold"><ShoppingCart size={22} className="text-laufit-600" /> Carrito</h2>
-            {lineas.length > 0 && <button type="button" onClick={() => setCarrito({})} className="text-sm font-semibold text-ink-400 hover:text-laufit-600">Vaciar</button>}
+            <h2 className="flex items-center gap-2 font-display text-2xl font-bold"><ShoppingCart size={22} className="text-brand-600" /> Carrito</h2>
+            {lineas.length > 0 && <button type="button" onClick={() => setCarrito({})} className="text-sm font-semibold text-ink-400 hover:text-brand-600">Vaciar</button>}
           </div>
 
           {lineas.length === 0 ? (
@@ -277,7 +277,7 @@ export default function MarketPage() {
                     <button type="button" onClick={() => agregar(p, 1)} aria-label={`Agregar una unidad de ${p.nombre}`} className="flex h-9 w-9 items-center justify-center rounded-lg bg-ink-100 hover:bg-ink-200"><Plus size={16} /></button>
                   </div>
                   <span className="w-20 text-right text-sm font-bold tabular-nums">{soles(round2(p.precioVenta * cantidad))}</span>
-                  <button type="button" onClick={() => agregar(p, -cantidad)} aria-label={`Eliminar ${p.nombre}`} className="rounded-lg p-1.5 text-ink-300 hover:bg-laufit-50 hover:text-laufit-600"><Trash2 size={16} /></button>
+                  <button type="button" onClick={() => agregar(p, -cantidad)} aria-label={`Eliminar ${p.nombre}`} className="rounded-lg p-1.5 text-ink-300 hover:bg-brand-50 hover:text-brand-600"><Trash2 size={16} /></button>
                 </li>
               ))}
             </ul>
@@ -294,7 +294,7 @@ export default function MarketPage() {
             <div className="grid grid-cols-3 gap-2" role="group" aria-label="Comprobante">
               {(['BOLETA', 'FACTURA', 'NOTA_DESPACHO'] as const).map((c) => (
                 <button key={c} type="button" aria-pressed={comprobante === c} onClick={() => elegirComprobante(c)}
-                  className={`rounded-xl border-2 px-1 py-2 text-xs font-bold sm:text-sm ${comprobante === c ? 'border-laufit-600 bg-laufit-50 text-laufit-700' : 'border-ink-100 text-ink-600'}`}>
+                  className={`rounded-xl border-2 px-1 py-2 text-xs font-bold sm:text-sm ${comprobante === c ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-ink-100 text-ink-600'}`}>
                   {c === 'NOTA_DESPACHO' ? 'N. despacho' : ETIQUETA_COMPROBANTE[c]}
                 </button>
               ))}
@@ -317,7 +317,7 @@ export default function MarketPage() {
             <div className="grid grid-cols-5 gap-1.5" role="group" aria-label="Método de pago">
               {METODOS.map((m) => (
                 <button key={m.valor} type="button" aria-pressed={metodo === m.valor} onClick={() => setMetodo(m.valor)}
-                  className={`rounded-xl border-2 px-1 py-2 text-xs font-bold ${metodo === m.valor ? 'border-laufit-600 bg-laufit-50 text-laufit-700' : 'border-ink-100 text-ink-600'}`}>
+                  className={`rounded-xl border-2 px-1 py-2 text-xs font-bold ${metodo === m.valor ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-ink-100 text-ink-600'}`}>
                   {m.etiqueta}
                 </button>
               ))}
@@ -332,7 +332,7 @@ export default function MarketPage() {
                   <input value={recibido} onChange={(e) => setRecibido(e.target.value)} inputMode="decimal" placeholder="Recibido" aria-label="Monto recibido" className="field min-h-9 w-28 py-1.5 text-sm" />
                 </div>
                 {vuelto !== null && (
-                  <p className={`mt-2 text-center font-display text-3xl font-bold ${vuelto < 0 ? 'text-laufit-600' : 'text-emerald-600'}`}>
+                  <p className={`mt-2 text-center font-display text-3xl font-bold ${vuelto < 0 ? 'text-danger-600' : 'text-emerald-600'}`}>
                     {vuelto < 0 ? `Falta ${soles(-vuelto)}` : `Vuelto ${soles(vuelto)}`}
                   </p>
                 )}
@@ -343,11 +343,11 @@ export default function MarketPage() {
           {ultima && (
             <div className="flex items-center justify-between gap-2 rounded-xl bg-emerald-50 px-4 py-2 text-sm">
               <span className="min-w-0 truncate"><strong>{ultima.numeracion}</strong> · {soles(ultima.total)}</span>
-              <a href={`/api/facturacion/${ultima.id}/pdf`} target="_blank" rel="noopener noreferrer" className="shrink-0 font-bold text-laufit-600 underline">Ver PDF</a>
+              <a href={`/api/facturacion/${ultima.id}/pdf`} target="_blank" rel="noopener noreferrer" className="shrink-0 font-bold text-brand-600 underline">Ver PDF</a>
             </div>
           )}
 
-          {errorVenta && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{errorVenta}</p>}
+          {errorVenta && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{errorVenta}</p>}
 
           <button type="button" onClick={() => void cobrar()} disabled={lineas.length === 0 || cobrando || faltaRuc} className="btn-brand h-14 w-full text-lg">
             {cobrando && <Spinner />} Cobrar {total > 0 && soles(total)}

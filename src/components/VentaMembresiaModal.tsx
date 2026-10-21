@@ -100,7 +100,7 @@ export function VentaMembresiaModal({ socio, onClose, onHecho }: Props) {
           {!planes ? (
             <p className="flex items-center gap-2 text-sm text-ink-500"><Spinner /> Cargando planes…</p>
           ) : planes.length === 0 ? (
-            <p className="text-sm text-laufit-700">No hay planes activos. El gerente debe crearlos en Planes.</p>
+            <p className="text-sm text-danger-700">No hay planes activos. El gerente debe crearlos en Planes.</p>
           ) : (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {planes.map((p) => (
@@ -109,10 +109,10 @@ export function VentaMembresiaModal({ socio, onClose, onHecho }: Props) {
                   key={p.id}
                   onClick={() => setPlanId(p.id)}
                   aria-pressed={planId === p.id}
-                  className={`rounded-xl border-2 px-3 py-3 text-left transition ${planId === p.id ? 'border-laufit-600 bg-laufit-50' : 'border-ink-100 bg-white hover:border-ink-300'}`}
+                  className={`rounded-xl border-2 px-3 py-3 text-left transition ${planId === p.id ? 'border-brand-600 bg-brand-50' : 'border-ink-100 bg-white hover:border-ink-300'}`}
                 >
                   <span className="block font-display text-xl font-bold leading-none">{p.nombre}</span>
-                  <span className="mt-1 block text-sm font-semibold text-laufit-600">{soles(p.precio)}</span>
+                  <span className="mt-1 block text-sm font-semibold text-brand-600">{soles(p.precio)}</span>
                 </button>
               ))}
             </div>
@@ -138,7 +138,7 @@ export function VentaMembresiaModal({ socio, onClose, onHecho }: Props) {
           <div className="grid grid-cols-3 gap-2">
             {(['BOLETA', 'FACTURA', 'NOTA_DESPACHO'] as const).map((tipo) => (
               <button type="button" key={tipo} aria-pressed={comprobante === tipo} onClick={() => setComprobante(tipo)}
-                className={`rounded-xl border-2 px-2 py-2 text-sm font-bold ${comprobante === tipo ? 'border-laufit-600 bg-laufit-50 text-laufit-700' : 'border-ink-100'}`}>
+                className={`rounded-xl border-2 px-2 py-2 text-sm font-bold ${comprobante === tipo ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-ink-100'}`}>
                 {ETIQUETA_COMPROBANTE[tipo]}
               </button>
             ))}
@@ -177,12 +177,12 @@ export function VentaMembresiaModal({ socio, onClose, onHecho }: Props) {
               </div>
             ))}
           </div>
-          <button type="button" onClick={() => setPagos([...pagos.map((p, i) => (i === 0 && !p.monto && total ? { ...p, monto: String(total) } : p)), { metodo: 'YAPE', monto: '' }])} className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-laufit-600">
+          <button type="button" onClick={() => setPagos([...pagos.map((p, i) => (i === 0 && !p.monto && total ? { ...p, monto: String(total) } : p)), { metodo: 'YAPE', monto: '' }])} className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-brand-600">
             <Plus size={15} /> Dividir en varios métodos
           </button>
         </fieldset>
 
-        {error && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{error}</p>}
+        {error && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{error}</p>}
 
         <div className="flex justify-end gap-2">
           <button type="button" onClick={onClose} className="btn-ghost">Cancelar</button>

@@ -89,7 +89,7 @@ function Marcar() {
               role="radio"
               aria-checked={tipoDocumento === tipo}
               onClick={() => setTipoDocumento(tipo)}
-              className={`rounded-lg px-2 py-2 text-sm font-bold transition ${tipoDocumento === tipo ? 'bg-white text-laufit-600 shadow' : 'text-ink-500'}`}
+              className={`rounded-lg px-2 py-2 text-sm font-bold transition ${tipoDocumento === tipo ? 'bg-white text-brand-600 shadow' : 'text-ink-500'}`}
             >
               {tipo === 'CE' ? 'C.E.' : tipo}
             </button>
@@ -109,7 +109,7 @@ function Marcar() {
           placeholder={tipoDocumento === 'DNI' ? '12345678' : ''}
         />
 
-        {error && <p role="alert" className="mt-3 rounded-xl bg-laufit-50 px-3 py-2 text-sm font-semibold text-laufit-700">{error}</p>}
+        {error && <p role="alert" className="mt-3 rounded-xl bg-danger-50 px-3 py-2 text-sm font-semibold text-danger-700">{error}</p>}
 
         <button type="submit" disabled={enviando || !numero.trim()} className="btn-brand mt-5 w-full text-base">
           {enviando && <Spinner />} Marcar
@@ -168,7 +168,7 @@ function Marcar() {
 function Pantalla({ tarjeta, icono, tono, titulo, texto, onVolver }: { tarjeta: string; icono: string; tono: 'ok' | 'aviso'; titulo: string; texto: string; onVolver: () => void }) {
   return (
     <div className={`${tarjeta} text-center`}>
-      <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full text-3xl font-extrabold text-white ${tono === 'ok' ? 'bg-emerald-600' : 'bg-laufit-600'}`}>{icono}</div>
+      <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full text-3xl font-extrabold text-white ${tono === 'ok' ? 'bg-emerald-600' : 'bg-brand-600'}`}>{icono}</div>
       <h1 className="page-heading mt-4 text-3xl leading-tight">{titulo}</h1>
       <p className="mt-2 text-sm text-ink-500">{texto}</p>
       <button type="button" onClick={onVolver} className="btn-ghost mt-6 w-full">Volver</button>

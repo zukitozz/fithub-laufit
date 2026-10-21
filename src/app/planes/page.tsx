@@ -53,7 +53,7 @@ export default function PlanesPage() {
         <button type="button" onClick={() => setEditando({ ...NUEVO })} className="btn-brand"><Plus size={18} /> Nuevo plan</button>
       </header>
 
-      {error && <p role="alert" className="mb-3 text-laufit-700">{String(error.message)}</p>}
+      {error && <p role="alert" className="mb-3 text-danger-700">{String(error.message)}</p>}
       <div className="card-surface overflow-x-auto p-0">
         <table className="w-full min-w-[560px]">
           <thead className="border-b border-ink-100"><tr><th className="th">Plan</th><th className="th">Duración</th><th className="th">Precio</th><th className="th">Matrícula</th><th className="th">Estado</th><th className="th" /></tr></thead>
@@ -101,8 +101,8 @@ export default function PlanesPage() {
                 <input id="pmat" type="number" min={0} step="0.01" value={editando.matricula} onChange={(e) => setEditando({ ...editando, matricula: Number(e.target.value) })} className="field" />
               </div>
             </div>
-            <label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={editando.activo} onChange={(e) => setEditando({ ...editando, activo: e.target.checked })} className="h-5 w-5 accent-laufit-600" /> Plan activo (se puede vender)</label>
-            {errorForm && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{errorForm}</p>}
+            <label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={editando.activo} onChange={(e) => setEditando({ ...editando, activo: e.target.checked })} className="h-5 w-5 accent-brand-600" /> Plan activo (se puede vender)</label>
+            {errorForm && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{errorForm}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setEditando(null)} className="btn-ghost">Cancelar</button>
               <button type="submit" disabled={enviando} className="btn-brand">{enviando && <Spinner />} Guardar</button>

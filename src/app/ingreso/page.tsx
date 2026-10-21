@@ -35,8 +35,8 @@ interface Feed {
 const BORDE: Record<string, string> = {
   VIGENTE: 'border-emerald-500',
   POR_VENCER: 'border-amber-500',
-  VENCIDA: 'border-laufit-600',
-  SIN_MEMBRESIA: 'border-laufit-600',
+  VENCIDA: 'border-danger-600',
+  SIN_MEMBRESIA: 'border-danger-600',
 }
 
 function pitido() {
@@ -111,7 +111,7 @@ export default function IngresoPage() {
           <h1 className="page-heading text-4xl">Ingresos de hoy</h1>
           <p className="text-sm text-ink-500">
             {activos.length} {activos.length === 1 ? 'ingreso' : 'ingresos'}
-            {data && data.pendientes > 0 && <> · <strong className="text-laufit-600">{data.pendientes} por revisar</strong></>}
+            {data && data.pendientes > 0 && <> · <strong className="text-danger-600">{data.pendientes} por revisar</strong></>}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -150,7 +150,7 @@ export default function IngresoPage() {
         </section>
       )}
 
-      {error && <p role="alert" className="mb-4 rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">No se pudo actualizar el panel: {String(error.message)}</p>}
+      {error && <p role="alert" className="mb-4 rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">No se pudo actualizar el panel: {String(error.message)}</p>}
       {!data && !error && <p className="flex items-center gap-2 text-ink-500"><Spinner /> Cargando…</p>}
       {data && items.length === 0 && (
         <div className="card-surface py-12 text-center text-ink-500">
@@ -167,7 +167,7 @@ export default function IngresoPage() {
           return (
             <article
               key={t.id}
-              className={`card-surface border-l-8 ${anulada ? 'border-ink-300 opacity-60' : BORDE[t.estado] ?? 'border-ink-300'} ${nuevos.has(t.id) ? 'tarjeta-nueva ring-4 ring-laufit-200' : ''}`}
+              className={`card-surface border-l-8 ${anulada ? 'border-ink-300 opacity-60' : BORDE[t.estado] ?? 'border-ink-300'} ${nuevos.has(t.id) ? 'tarjeta-nueva ring-4 ring-brand-200' : ''}`}
             >
               <div className="flex gap-4">
                 <Avatar nombre={t.socio.nombre} url={t.socio.fotoUrl} className="h-28 w-28 text-3xl" />
@@ -178,7 +178,7 @@ export default function IngresoPage() {
                   </div>
                   <p className="text-xs text-ink-400">{t.socio.tipoDocumento} {t.socio.documento}</p>
 
-                  <p className={`mt-2 font-display text-3xl font-bold leading-none ${noVigente ? 'text-laufit-600' : t.estado === 'POR_VENCER' ? 'text-amber-600' : 'text-emerald-600'}`}>
+                  <p className={`mt-2 font-display text-3xl font-bold leading-none ${noVigente ? 'text-danger-600' : t.estado === 'POR_VENCER' ? 'text-amber-600' : 'text-emerald-600'}`}>
                     {t.estado === 'SIN_MEMBRESIA' ? 'Sin membresía' : textoDias(t.diasRestantes)}
                   </p>
                   <p className="mt-1 text-sm text-ink-600">
@@ -197,8 +197,8 @@ export default function IngresoPage() {
 
               {(t.socio.cumpleHoy || t.socio.condicionMedica || t.socio.notas) && (
                 <div className="mt-3 space-y-1 rounded-xl bg-ink-50 p-3 text-sm">
-                  {t.socio.cumpleHoy && <p className="flex items-center gap-2 font-semibold text-laufit-700"><Cake size={16} /> ¡Hoy es su cumpleaños!</p>}
-                  {t.socio.condicionMedica && <p className="flex items-start gap-2"><HeartPulse size={16} className="mt-0.5 shrink-0 text-laufit-600" /> {t.socio.condicionMedica}</p>}
+                  {t.socio.cumpleHoy && <p className="flex items-center gap-2 font-semibold text-brand-700"><Cake size={16} /> ¡Hoy es su cumpleaños!</p>}
+                  {t.socio.condicionMedica && <p className="flex items-start gap-2"><HeartPulse size={16} className="mt-0.5 shrink-0 text-brand-600" /> {t.socio.condicionMedica}</p>}
                   {t.socio.notas && <p className="text-ink-600">{t.socio.notas}</p>}
                 </div>
               )}

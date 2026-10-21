@@ -9,3 +9,4 @@ out
 .claude/settings.local.json
 tsconfig.tsbuildinfo
 .next-test
+.next-demo

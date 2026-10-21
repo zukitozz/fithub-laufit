@@ -4,7 +4,10 @@ import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { BrandLogo } from '@/components/BrandLogo'
+import { obtenerTenant } from '@/lib/tenant'
 import { Spinner } from '@/components/Spinner'
+
+const tenant = obtenerTenant()
 
 function destinoSeguro(callbackUrl: string | null) {
   if (!callbackUrl || !callbackUrl.startsWith('/') || callbackUrl.startsWith('//')) return '/dashboard'
@@ -37,11 +40,11 @@ function LoginForm() {
   return (
     <div className="flex min-h-screen flex-col bg-ink-900 lg:flex-row">
       <div className="relative flex flex-col items-center justify-center gap-6 overflow-hidden px-8 py-12 lg:w-1/2">
-        <div className="pointer-events-none absolute -left-24 top-1/3 h-64 w-[140%] -rotate-12 bg-laufit-600/20 blur-3xl" />
+        <div className="pointer-events-none absolute -left-24 top-1/3 h-64 w-[140%] -rotate-12 bg-brand-600/20 blur-3xl" />
         <BrandLogo />
         <div className="relative text-center">
           <p className="font-display text-5xl font-extrabold uppercase leading-none tracking-wide text-white sm:text-6xl">
-            Invierte en tu <span className="text-laufit-500">bienestar</span>
+            {tenant.eslogan.antes} <span className="text-brand-400">{tenant.eslogan.destacado}</span>
           </p>
           <p className="mt-4 text-sm text-ink-300">Gestión de socios, asistencia y facturación</p>
         </div>
@@ -63,7 +66,7 @@ function LoginForm() {
             <input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="field" />
           </div>
 
-          {error && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{error}</p>}
+          {error && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{error}</p>}
 
           <button type="submit" disabled={enviando} className="btn-brand w-full">
             {enviando && <Spinner />} Entrar

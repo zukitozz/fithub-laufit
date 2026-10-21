@@ -76,15 +76,15 @@ export default function CumpleanosPage() {
             role="tab"
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
-            className={`rounded-2xl border-2 px-4 py-3 text-left transition ${tab === t.id ? 'border-laufit-600 bg-laufit-50' : 'border-ink-100 bg-white hover:border-ink-300'}`}
+            className={`rounded-2xl border-2 px-4 py-3 text-left transition ${tab === t.id ? 'border-brand-600 bg-brand-50' : 'border-ink-100 bg-white hover:border-ink-300'}`}
           >
             <span className="block text-xs font-bold uppercase tracking-wide text-ink-500">{t.etiqueta}</span>
-            <span className={`font-display text-4xl font-extrabold leading-none ${t.id === 'hoy' && (data?.conteos.hoy ?? 0) > 0 ? 'text-laufit-600' : 'text-ink-900'}`}>{data ? data.conteos[t.id] : '–'}</span>
+            <span className={`font-display text-4xl font-extrabold leading-none ${t.id === 'hoy' && (data?.conteos.hoy ?? 0) > 0 ? 'text-brand-600' : 'text-ink-900'}`}>{data ? data.conteos[t.id] : '–'}</span>
           </button>
         ))}
       </div>
 
-      {error && <p role="alert" className="mb-3 rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{String(error.message)}</p>}
+      {error && <p role="alert" className="mb-3 rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{String(error.message)}</p>}
       {isLoading && !data && <p className="text-ink-500"><Spinner /> Cargando…</p>}
 
       {data && data.items.length === 0 && (
@@ -97,12 +97,12 @@ export default function CumpleanosPage() {
         {data?.items.map((i) => {
           const necesitaRenovar = ['POR_VENCER', 'VENCIDA', 'SIN_MEMBRESIA'].includes(i.estado)
           return (
-            <li key={i.socio.id} className={`card-surface ${i.dias === 0 && tab !== 'mes' ? 'border-laufit-300 bg-laufit-50/40' : ''}`}>
+            <li key={i.socio.id} className={`card-surface ${i.dias === 0 && tab !== 'mes' ? 'border-brand-300 bg-brand-50/40' : ''}`}>
               <div className="flex flex-wrap items-start gap-4">
                 <Avatar nombre={i.socio.nombre} url={i.socio.fotoUrl} className="h-16 w-16 text-xl" />
                 <div className="min-w-0 flex-1 basis-60">
-                  <Link href={`/socios/${i.socio.id}`} className="font-display text-2xl font-bold leading-tight text-ink-900 hover:text-laufit-600">{i.socio.nombre}</Link>
-                  <p className="mt-0.5 flex items-center gap-1.5 text-sm font-semibold text-laufit-700"><Cake size={16} /> Cumple {i.edad} {cuando(i.dias, i.fecha)}</p>
+                  <Link href={`/socios/${i.socio.id}`} className="font-display text-2xl font-bold leading-tight text-ink-900 hover:text-brand-600">{i.socio.nombre}</Link>
+                  <p className="mt-0.5 flex items-center gap-1.5 text-sm font-semibold text-brand-700"><Cake size={16} /> Cumple {i.edad} {cuando(i.dias, i.fecha)}</p>
                   <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ink-600">
                     <EstadoBadge estado={i.estado} />
                     {i.plan && <span>{i.plan}{i.diasRestantes !== null && <> · {textoDias(i.diasRestantes)}</>}</span>}

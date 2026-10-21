@@ -29,12 +29,12 @@ export function AppShell({ children }: { readonly children: React.ReactNode }) {
         onCloseMobile={() => setMobileOpen(false)}
       />
 
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-laufit-600/40 bg-ink-900 px-4 py-3 text-white md:hidden">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-brand-600/40 bg-ink-900 px-4 py-3 text-white md:hidden">
         <button
           type="button"
           aria-label="Abrir menú"
           onClick={() => setMobileOpen(true)}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-laufit-600/70 text-white transition hover:bg-laufit-700"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-600/70 text-white transition hover:bg-brand-700"
         >
           <Menu size={20} />
         </button>

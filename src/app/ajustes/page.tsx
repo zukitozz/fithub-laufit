@@ -136,7 +136,7 @@ export default function AjustesPage() {
           <div>
             <h2 className="font-display text-2xl font-bold">Avisos por WhatsApp</h2>
             <label className="mt-3 flex items-start gap-3 rounded-xl bg-ink-50 px-4 py-3 text-sm">
-              <input type="checkbox" checked={form.whatsappActivo} onChange={(e) => set('whatsappActivo', e.target.checked)} className="mt-0.5 h-5 w-5 accent-laufit-600" />
+              <input type="checkbox" checked={form.whatsappActivo} onChange={(e) => set('whatsappActivo', e.target.checked)} className="mt-0.5 h-5 w-5 accent-brand-600" />
               <span>Enviar por WhatsApp la bienvenida, el comprobante y los avisos de vencimiento (solo a socios que aceptaron). Con esto apagado no sale ningún mensaje.</span>
             </label>
           </div>

@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 :root {
+  /* Colores de la marca; layout.tsx los reemplaza con los del tema (TENANT). */
+  --brand-50: 254 242 242; --brand-100: 253 227 228; --brand-200: 251 201 203; --brand-300: 245 158 161; --brand-400: 236 95 101;
+  --brand-500: 224 38 45; --brand-600: 209 15 21; --brand-700: 168 11 16; --brand-800: 127 10 14; --brand-900: 77 6 9;
   color-scheme: light;
   font-family: var(--font-body), system-ui, sans-serif;
   background-color: #f6f6f7;
@@ -37,7 +40,7 @@ select {
 }
 
 ::selection {
-  background: rgba(209, 15, 21, 0.18);
+  background: rgb(var(--brand-600) / 0.18);
 }
 
 .font-display {
@@ -51,7 +54,7 @@ select {
   font-weight: 700;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: #d10f15;
+  color: rgb(var(--brand-600));
 }
 
 .page-heading {
@@ -63,7 +66,7 @@ select {
 
 @layer components {
   .btn-brand {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-laufit-600 px-5 py-2.5 text-sm font-bold text-white shadow-[0_10px_22px_rgba(209,15,21,0.25)] transition hover:bg-laufit-700 focus:outline-none focus:ring-4 focus:ring-laufit-100 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-[0_10px_22px_rgb(var(--brand-600)/0.25)] transition hover:bg-brand-700 focus:outline-none focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-ghost {
@@ -79,7 +82,7 @@ select {
   }
 
   .field {
-    @apply min-h-11 w-full rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-900 outline-none transition placeholder:text-ink-300 focus:border-laufit-500 focus:ring-4 focus:ring-laufit-100;
+    @apply min-h-11 w-full rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-900 outline-none transition placeholder:text-ink-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-100;
   }
 
   .label {
@@ -101,7 +104,7 @@ select {
 
 button:focus-visible,
 a:focus-visible {
-  @apply outline-none ring-4 ring-laufit-100;
+  @apply outline-none ring-4 ring-brand-100;
 }
 
 @keyframes aparecer {

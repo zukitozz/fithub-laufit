@@ -91,7 +91,7 @@ function TablaComprobantes({ facturas }: { facturas: FilaComprobante[] }) {
               <td className="td">{f.receptorNombre}</td>
               <td className="td text-ink-500">{f.usuario?.name ?? '—'}</td>
               <td className="td text-xs">{f.metodoPago}</td>
-              <td className={`td text-right font-semibold ${f.tipo === 'NOTA_CREDITO' ? 'text-laufit-600' : ''}`}>{f.tipo === 'NOTA_CREDITO' && '−'}{soles(f.total)}</td>
+              <td className={`td text-right font-semibold ${f.tipo === 'NOTA_CREDITO' ? 'text-danger-600' : ''}`}>{f.tipo === 'NOTA_CREDITO' && '−'}{soles(f.total)}</td>
             </tr>
           ))}
         </tbody>
@@ -141,7 +141,7 @@ export default function CierresPage() {
         <p className="text-sm text-ink-500">Cierra todo lo cobrado desde el cierre anterior: membresías, productos y devoluciones.</p>
       </header>
 
-      {error && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{String(error.message)}</p>}
+      {error && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{String(error.message)}</p>}
       {!pendiente && !error && <p className="text-ink-500"><Spinner /> Cargando…</p>}
 
       {pendiente && (
@@ -166,7 +166,7 @@ export default function CierresPage() {
                   <label htmlFor="contado" className="label">Efectivo contado</label>
                   <input id="contado" type="number" min={0} step="0.01" inputMode="decimal" value={contado} onChange={(e) => setContado(e.target.value)} className="field text-lg" placeholder="Cuenta la caja" />
                   {diferencia !== null && (
-                    <p className={`mt-1 text-sm font-bold ${diferencia === 0 ? 'text-emerald-600' : 'text-laufit-600'}`}>
+                    <p className={`mt-1 text-sm font-bold ${diferencia === 0 ? 'text-emerald-600' : 'text-danger-600'}`}>
                       {diferencia === 0 ? 'Caja cuadrada' : diferencia > 0 ? `Sobran ${soles(diferencia)}` : `Faltan ${soles(-diferencia)}`}
                     </p>
                   )}
@@ -177,7 +177,7 @@ export default function CierresPage() {
                 </div>
               </div>
 
-              {errorCierre && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{errorCierre}</p>}
+              {errorCierre && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{errorCierre}</p>}
               <div className="flex justify-end">
                 <button type="button" onClick={() => setConfirmando(true)} className="btn-brand">Cerrar turno</button>
               </div>
@@ -204,7 +204,7 @@ export default function CierresPage() {
                 <td className="td">{c.cantidadComprobantes}</td>
                 <td className="td font-semibold">{soles(c.totalVentas)}</td>
                 <td className="td">{soles(c.totalEfectivo)}</td>
-                <td className={`td font-semibold ${c.diferencia === null ? 'text-ink-300' : c.diferencia === 0 ? 'text-emerald-600' : 'text-laufit-600'}`}>{c.diferencia === null ? 'Sin contar' : soles(c.diferencia)}</td>
+                <td className={`td font-semibold ${c.diferencia === null ? 'text-ink-300' : c.diferencia === 0 ? 'text-emerald-600' : 'text-danger-600'}`}>{c.diferencia === null ? 'Sin contar' : soles(c.diferencia)}</td>
                 <td className="td text-right"><button type="button" onClick={() => setDetalleId(c.id)} className="btn-ghost btn-sm">Ver</button></td>
               </tr>
             ))}
@@ -243,7 +243,7 @@ export default function CierresPage() {
               <Totales porMetodo={{ EFECTIVO: detalle.totalEfectivo, YAPE: detalle.totalYape, TARJETA: detalle.totalTarjeta, TRANSFERENCIA: detalle.totalTransferencia, DEPOSITO: detalle.totalDeposito }} total={detalle.totalVentas} />
               <div className="flex flex-wrap gap-x-8 gap-y-1 text-sm">
                 <span>Efectivo contado: <strong>{detalle.efectivoContado === null ? 'sin arqueo' : soles(detalle.efectivoContado)}</strong></span>
-                {detalle.diferencia !== null && <span className={detalle.diferencia === 0 ? 'font-bold text-emerald-600' : 'font-bold text-laufit-600'}>{detalle.diferencia === 0 ? 'Caja cuadrada' : detalle.diferencia > 0 ? `Sobraron ${soles(detalle.diferencia)}` : `Faltaron ${soles(-detalle.diferencia)}`}</span>}
+                {detalle.diferencia !== null && <span className={detalle.diferencia === 0 ? 'font-bold text-emerald-600' : 'font-bold text-danger-600'}>{detalle.diferencia === 0 ? 'Caja cuadrada' : detalle.diferencia > 0 ? `Sobraron ${soles(detalle.diferencia)}` : `Faltaron ${soles(-detalle.diferencia)}`}</span>}
               </div>
               {detalle.notas && <p className="rounded-xl bg-ink-50 px-4 py-2 text-sm">{detalle.notas}</p>}
               {detalle.productos.length > 0 && (

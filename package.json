@@ -10,6 +10,8 @@
     "prisma": "prisma",
     "seed": "tsx --env-file-if-exists=.env prisma/seed.ts",
     "postinstall": "prisma generate",
+    "dev:demo": "node --env-file=.env.demo ./node_modules/next/dist/bin/next dev -p 3100",
+    "seed:demo": "tsx --env-file=.env.demo prisma/seed.ts",
     "vercel-build": "if [ \"$VERCEL_ENV\" = \"production\" ]; then prisma migrate deploy; fi && next build"
   },
   "dependencies": {

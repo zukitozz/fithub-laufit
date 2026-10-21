@@ -46,7 +46,7 @@ const POSPONER = [
 ]
 
 function colorDias(dias: number) {
-  if (dias < 0) return 'text-laufit-600'
+  if (dias < 0) return 'text-danger-600'
   if (dias <= 1) return 'text-amber-600'
   return 'text-ink-900'
 }
@@ -97,10 +97,10 @@ export default function VencimientosPage() {
               role="tab"
               aria-selected={activa}
               onClick={() => setTab(t.id)}
-              className={`rounded-2xl border-2 px-4 py-3 text-left transition ${activa ? 'border-laufit-600 bg-laufit-50' : 'border-ink-100 bg-white hover:border-ink-300'}`}
+              className={`rounded-2xl border-2 px-4 py-3 text-left transition ${activa ? 'border-brand-600 bg-brand-50' : 'border-ink-100 bg-white hover:border-ink-300'}`}
             >
               <span className="block text-xs font-bold uppercase tracking-wide text-ink-500">{t.etiqueta}</span>
-              <span className={`font-display text-4xl font-extrabold leading-none ${t.alerta && n > 0 ? 'text-laufit-600' : 'text-ink-900'}`}>{data ? n : '–'}</span>
+              <span className={`font-display text-4xl font-extrabold leading-none ${t.alerta && n > 0 ? 'text-danger-600' : 'text-ink-900'}`}>{data ? n : '–'}</span>
             </button>
           )
         })}
@@ -117,7 +117,7 @@ export default function VencimientosPage() {
         </select>
       </div>
 
-      {error && <p role="alert" className="mb-3 rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{String(error.message)}</p>}
+      {error && <p role="alert" className="mb-3 rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{String(error.message)}</p>}
       {isLoading && !data && <p className="text-ink-500"><Spinner /> Cargando…</p>}
 
       {data && data.items.length === 0 && (
@@ -133,7 +133,7 @@ export default function VencimientosPage() {
             <div className="flex flex-wrap items-start gap-4">
               <Avatar nombre={i.socio.nombre} url={i.socio.fotoUrl} className="h-16 w-16 text-xl" />
               <div className="min-w-0 flex-1 basis-60">
-                <Link href={`/socios/${i.socio.id}`} className="font-display text-2xl font-bold leading-tight text-ink-900 hover:text-laufit-600">{i.socio.nombre}</Link>
+                <Link href={`/socios/${i.socio.id}`} className="font-display text-2xl font-bold leading-tight text-ink-900 hover:text-brand-600">{i.socio.nombre}</Link>
                 <p className="text-xs text-ink-400">{i.socio.tipoDocumento} {i.socio.numeroDocumento}{i.socio.celular && <> · {i.socio.celular}</>}</p>
                 <p className="mt-1 text-sm text-ink-600">{i.plan} · vence {fechaCorta(i.fechaFin)}</p>
               </div>

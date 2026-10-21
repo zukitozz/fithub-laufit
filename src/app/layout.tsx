@@ -3,6 +3,9 @@ import type { Metadata, Viewport } from 'next'
 import { Barlow_Condensed, Inter } from 'next/font/google'
 import { Providers } from '@/components/Providers'
 import { AppShell } from '@/components/AppShell'
+import { obtenerTenant, variablesCss } from '@/lib/tenant'
+
+const tenant = obtenerTenant()
 
 const barlow = Barlow_Condensed({
   subsets: ['latin'],
@@ -19,9 +22,9 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'FitHub · LAUFIT Fitness Club',
-  description: 'Gestión de membresías, asistencia y facturación de LAUFIT Fitness Club',
-  icons: { icon: '/logo-laufit.png' },
+  title: `FitHub · ${tenant.nombre}`,
+  description: `Gestión de membresías, asistencia y facturación de ${tenant.nombre}`,
+  icons: { icon: tenant.logoCompacto },
 }
 
 export const viewport: Viewport = {
@@ -31,7 +34,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { readonly children: React.ReactNode }) {
   return (
-    <html lang="es-PE" className={`${barlow.variable} ${inter.variable}`}>
+    <html lang="es-PE" className={`${barlow.variable} ${inter.variable}`} style={Object.fromEntries(variablesCss(tenant).split(';').map((d) => d.split(':')))}>
       <body>
         <Providers><AppShell>{children}</AppShell></Providers>
       </body>

@@ -115,7 +115,7 @@ export default function CoachesPage() {
                   {c.marcaciones.map((m) => (
                     <li key={m.id} className={`flex items-center gap-1 rounded-lg px-2 py-1 ${m.anulada ? 'bg-ink-100 text-ink-400 line-through' : m.tipo === 'ENTRADA' ? 'bg-emerald-50 text-emerald-800' : 'bg-ink-100 text-ink-700'}`}>
                       {m.tipo === 'ENTRADA' ? '→' : '←'} {horaLima(m.fechaHora)} {m.origen === 'MANUAL' && '(manual)'}
-                      {!m.anulada && <button type="button" onClick={() => { setError(null); setTexto(''); setAnulando(m.id) }} className="ml-1 font-bold text-laufit-600" aria-label="Anular marcación">×</button>}
+                      {!m.anulada && <button type="button" onClick={() => { setError(null); setTexto(''); setAnulando(m.id) }} className="ml-1 font-bold text-danger-600" aria-label="Anular marcación">×</button>}
                     </li>
                   ))}
                 </ul>
@@ -170,8 +170,8 @@ export default function CoachesPage() {
               <label htmlFor="cc" className="label">Celular</label>
               <input id="cc" value={editando.celular} onChange={(e) => setEditando({ ...editando, celular: e.target.value })} className="field" inputMode="tel" />
             </div>
-            <label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={editando.activo} onChange={(e) => setEditando({ ...editando, activo: e.target.checked })} className="h-5 w-5 accent-laufit-600" /> Activo</label>
-            {error && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{error}</p>}
+            <label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={editando.activo} onChange={(e) => setEditando({ ...editando, activo: e.target.checked })} className="h-5 w-5 accent-brand-600" /> Activo</label>
+            {error && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{error}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setEditando(null)} className="btn-ghost">Cancelar</button>
               <button type="submit" disabled={enviando} className="btn-brand">{enviando && <Spinner />} Guardar</button>
@@ -200,7 +200,7 @@ export default function CoachesPage() {
               <label htmlFor="mm" className="label">Motivo</label>
               <input id="mm" required minLength={3} value={texto} onChange={(e) => setTexto(e.target.value)} className="field" placeholder="Olvidó marcar, falló su celular…" />
             </div>
-            {error && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{error}</p>}
+            {error && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{error}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setManual(null)} className="btn-ghost">Cancelar</button>
               <button type="submit" disabled={enviando} className="btn-brand">{enviando && <Spinner />} Registrar</button>
@@ -216,7 +216,7 @@ export default function CoachesPage() {
               <label htmlFor="am" className="label">Motivo</label>
               <input id="am" required minLength={3} value={texto} onChange={(e) => setTexto(e.target.value)} className="field" />
             </div>
-            {error && <p role="alert" className="rounded-xl bg-laufit-50 px-4 py-2 text-sm font-semibold text-laufit-700">{error}</p>}
+            {error && <p role="alert" className="rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{error}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setAnulando(null)} className="btn-ghost">Cancelar</button>
               <button type="submit" disabled={enviando} className="btn-brand">{enviando && <Spinner />} Anular</button>

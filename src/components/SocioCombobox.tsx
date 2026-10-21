@@ -145,7 +145,7 @@ export function SocioCombobox({ value, onChange, placeholder = 'Buscar cliente p
                 elegir(s)
               }}
               onMouseEnter={() => setActivo(i)}
-              className={`flex cursor-pointer items-center gap-3 px-3 py-2 ${i === activo ? 'bg-laufit-50' : ''}`}
+              className={`flex cursor-pointer items-center gap-3 px-3 py-2 ${i === activo ? 'bg-brand-50' : ''}`}
             >
               <Avatar nombre={s.nombre} url={s.fotoUrl} className="h-9 w-9 text-xs" />
               <span className="min-w-0 flex-1">
