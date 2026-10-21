@@ -20,6 +20,12 @@ const PLAZO_PENDIENTE_MS = 3 * 24 * 60 * 60 * 1000
 /** Tiempo tras el cual la tarea deja de empezar envíos nuevos; lo que falte lo toma la siguiente corrida (es idempotente). */
 const PRESUPUESTO_MS = 240_000
 
+/** Identificador del gimnasio para el botón "Ver promociones" (solo el identificador, p. ej. "laufit"); null si falta o es inválido. */
+function promosSlug(): string | null {
+  const slug = process.env.NOTIF_PROMOS_SLUG?.trim()
+  return slug && /^[A-Za-z0-9._~-]+$/.test(slug) ? slug : null
+}
+
 /** Lo que se guarda en EnvioWhatsApp.solicitud para poder rearmar la llamada en un reintento. */
 interface SolicitudGuardada {
   topicoCodigo: TopicoCodigo
@@ -219,8 +225,8 @@ export interface ResumenAvisos {
 export async function ejecutarAvisosVencimiento(): Promise<ResumenAvisos> {
   const resumen: ResumenAvisos = { candidatos: 0, enviados: 0, fallidos: 0, sinConsentimiento: 0, pendientes: 0, yaResueltos: 0, reintentados: 0 }
   if (!(await avisosActivos())) return { ...resumen, omitido: 'WhatsApp desactivado en Ajustes o servicio sin configurar' }
-  const slug = process.env.NOTIF_PROMOS_SLUG
-  if (!slug) return { ...resumen, omitido: 'Falta NOTIF_PROMOS_SLUG' }
+  const slug = promosSlug()
+  if (!slug) return { ...resumen, omitido: 'Falta NOTIF_PROMOS_SLUG o no es válido (solo el identificador, p. ej. laufit)' }
 
   const inicio = Date.now()
   const sinTiempo = () => Date.now() - inicio > PRESUPUESTO_MS
@@ -341,6 +347,8 @@ export async function simularAvisoVencimiento(socioId: string, tipo: 'D3' | 'D0'
   if (!socio) return { ok: false, error: 'Socio no encontrado' }
   if (socio.bajaVoluntariaWhatsApp) return { ok: false, error: 'El socio pidió no recibir mensajes' }
   if (!socioAvisable(socio)) return { ok: false, error: 'El socio no tiene celular o no aceptó recibir WhatsApp' }
+  const slug = promosSlug()
+  if (!slug) return { ok: false, error: 'Falta NOTIF_PROMOS_SLUG o no es válido (solo el identificador, p. ej. laufit)' }
   const m = await prisma.membresia.findFirst({ where: { socioId, anulada: false }, orderBy: { fechaFin: 'desc' }, include: { plan: true } })
   if (!m) return { ok: false, error: 'El socio no tiene una membresía para simular' }
 
@@ -360,8 +368,7 @@ export async function simularAvisoVencimiento(socioId: string, tipo: 'D3' | 'D0'
     sufijoReferencia: `:sim${Date.now()}`,
     solicitud: {
       telefono: socio.celular,
-      // Sin el enlace acordado del gimnasio se usa el de ejemplo del spec.
-      botonUrlSufijo: process.env.NOTIF_PROMOS_SLUG || 'fithub-demo',
+      botonUrlSufijo: slug,
       variables: tipo === 'D3' ? { nombre, plan, negocio, fecha_vencimiento: fechaDMA(m.fechaFin) } : { nombre, plan, negocio },
     },
   })
