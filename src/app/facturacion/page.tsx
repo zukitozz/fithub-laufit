@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import useSWR from 'swr'
-import { FileText } from 'lucide-react'
+import { FileText, Printer } from 'lucide-react'
 import { Spinner } from '@/components/Spinner'
 import { fechaHoraLima, fetcher, soles } from '@/components/ui'
 import { ETIQUETA_COMPROBANTE, type TipoComprobanteApp } from '@/lib/comprobantes'
@@ -20,6 +20,23 @@ interface Fila {
   estadoFacturador: string | null
   errors: string | null
   numeracionDocumentoAfectado: string | null
+}
+
+/** Carga el ticket de 80 mm en un iframe oculto y abre el diálogo de impresión del navegador. */
+function imprimirTicket(id: string) {
+  let iframe = document.getElementById('ticket-print-frame') as HTMLIFrameElement | null
+  if (!iframe) {
+    iframe = document.createElement('iframe')
+    iframe.id = 'ticket-print-frame'
+    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'
+    document.body.appendChild(iframe)
+  }
+  const frame = iframe
+  frame.onload = () => setTimeout(() => {
+    frame.contentWindow?.focus()
+    frame.contentWindow?.print()
+  }, 150)
+  frame.src = `/api/facturacion/${id}/ticket?t=${Date.now()}`
 }
 
 function EstadoSunat({ f }: { readonly f: Fila }) {
@@ -95,7 +112,10 @@ export default function FacturacionPage() {
                 <td className="td text-xs">{f.metodoPago}</td>
                 <td className="td"><EstadoSunat f={f} /></td>
                 <td className="td text-right">
-                  <a href={`/api/facturacion/${f.id}/pdf`} target="_blank" rel="noopener noreferrer" className="btn-ghost btn-sm"><FileText size={14} /> PDF</a>
+                  <div className="flex justify-end gap-1">
+                    <a href={`/api/facturacion/${f.id}/pdf`} target="_blank" rel="noopener noreferrer" className="btn-ghost btn-sm"><FileText size={14} /> PDF</a>
+                    <button type="button" onClick={() => imprimirTicket(f.id)} className="btn-ghost btn-sm" title="Imprimir ticket de 80 mm en impresora térmica"><Printer size={14} /> Ticket</button>
+                  </div>
                 </td>
               </tr>
             ))}
