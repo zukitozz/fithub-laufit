@@ -4,6 +4,7 @@ import { obtenerConfiguracion } from '@/lib/config'
 import { esTipoDocumento, normalizarDocumento } from '@/lib/documentos'
 import { registrarAsistenciaSocio } from '@/lib/asistencia'
 import { proponerTipo, ultimaMarcacionValida } from '@/lib/coaches'
+import { hoyPeru, rangoDiaPeru } from '@/lib/fechas'
 import { ipDe, limitar } from '@/lib/ratelimit'
 
 export const dynamic = 'force-dynamic'
@@ -64,6 +65,19 @@ export async function POST(req: Request) {
     const marcacion = await prisma.marcacionCoach.create({ data: { coachId: coachActivo.id, tipo, origen: 'QR', ip } })
     return NextResponse.json({ resultado: 'COACH_OK', nombre, tipo, hora: hora(marcacion.fechaHora) })
   }
+
+  // Si ya marcó su ingreso hoy y sigue "dentro", escanear de nuevo ofrece marcar la salida (no crea otro ingreso).
+  const abierta = await prisma.asistencia.findFirst({
+    where: { socioId: socioActivo!.id, validacion: { not: 'ANULADA' }, salidaAt: null, fechaHora: rangoDiaPeru(hoyPeru()) },
+    orderBy: { fechaHora: 'desc' },
+    select: { id: true },
+  })
+  if (body.paso === 'salida') {
+    if (!abierta) return NextResponse.json({ resultado: 'SIN_INGRESO' })
+    const marcada = await prisma.asistencia.update({ where: { id: abierta.id }, data: { salidaAt: new Date() } })
+    return NextResponse.json({ resultado: 'SALIDA_OK', hora: hora(marcada.salidaAt!) })
+  }
+  if (abierta) return NextResponse.json({ resultado: 'YA_DENTRO' })
 
   const registro = await registrarAsistenciaSocio(socioActivo!, 'QR', { ip })
   return NextResponse.json({ resultado: registro.resultado })

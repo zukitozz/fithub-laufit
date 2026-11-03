@@ -21,8 +21,9 @@ export async function GET() {
   const [mes, dia] = [hoy.slice(5, 7), hoy.slice(8, 10)]
 
   const config = await obtenerConfiguracion()
+  const salieron = await prisma.asistencia.count({ where: { fechaHora: rango, salidaAt: { not: null }, validacion: { not: 'ANULADA' } } })
   const asistencias = await prisma.asistencia.findMany({
-    where: { fechaHora: rango },
+    where: { fechaHora: rango, salidaAt: null },
     orderBy: { fechaHora: 'desc' },
     take: MAX_TARJETAS,
     include: { socio: true },
@@ -85,5 +86,5 @@ export async function GET() {
     })
     .filter((c): c is NonNullable<typeof c> => c !== null)
 
-  return NextResponse.json({ items, pendientes, coaches: coachesHoy, ahora: new Date() })
+  return NextResponse.json({ items, pendientes, salieron, coaches: coachesHoy, ahora: new Date() })
 }

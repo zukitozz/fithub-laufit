@@ -10,7 +10,8 @@ type Doc = 'DNI' | 'CE' | 'RUC'
 type Como = 'SOCIO' | 'COACH'
 
 type Respuesta =
-  | { resultado: 'OK' | 'NO_VIGENTE' | 'DUPLICADO' | 'NO_ENCONTRADO' | 'ELEGIR' }
+  | { resultado: 'OK' | 'NO_VIGENTE' | 'DUPLICADO' | 'NO_ENCONTRADO' | 'ELEGIR' | 'YA_DENTRO' | 'SIN_INGRESO' }
+  | { resultado: 'SALIDA_OK'; hora: string }
   | { resultado: 'COACH_PREVIA'; nombre: string; propuesta: 'ENTRADA' | 'SALIDA' }
   | { resultado: 'COACH_OK'; nombre: string; tipo: 'ENTRADA' | 'SALIDA'; hora: string }
 
@@ -149,6 +150,22 @@ function Marcar() {
     )
   } else if (respuesta.resultado === 'OK') {
     contenido = <Pantalla tarjeta={tarjeta} icono="✓" tono="ok" titulo="Ingreso registrado" texto="¡Buen entrenamiento!" onVolver={reiniciar} />
+  } else if (respuesta.resultado === 'YA_DENTRO') {
+    contenido = (
+      <div className={`${tarjeta} text-center`}>
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-600 text-3xl font-extrabold text-white">✓</div>
+        <h1 className="page-heading mt-4 text-3xl leading-tight">Ya registraste tu ingreso</h1>
+        <p className="mt-2 text-sm text-ink-500">¿Ya te vas?</p>
+        <button type="button" disabled={enviando} onClick={() => void enviar({ paso: 'salida' })} className="btn-brand mt-6 w-full text-base">
+          {enviando && <Spinner />} Marcar mi salida
+        </button>
+        <button type="button" onClick={reiniciar} className="btn-ghost mt-3 w-full">Volver</button>
+      </div>
+    )
+  } else if (respuesta.resultado === 'SALIDA_OK') {
+    contenido = <Pantalla tarjeta={tarjeta} icono="✓" tono="ok" titulo="Salida registrada" texto={`${respuesta.hora} · ¡Hasta pronto!`} onVolver={reiniciar} />
+  } else if (respuesta.resultado === 'SIN_INGRESO') {
+    contenido = <Pantalla tarjeta={tarjeta} icono="?" tono="aviso" titulo="No tienes un ingreso abierto" texto="Escanea de nuevo para marcar tu ingreso." onVolver={reiniciar} />
   } else if (respuesta.resultado === 'DUPLICADO') {
     contenido = <Pantalla tarjeta={tarjeta} icono="✓" tono="ok" titulo="Ya registraste tu ingreso" texto="No necesitas marcar otra vez." onVolver={reiniciar} />
   } else if (respuesta.resultado === 'NO_VIGENTE') {

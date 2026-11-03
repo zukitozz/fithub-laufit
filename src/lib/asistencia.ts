@@ -26,7 +26,7 @@ export async function registrarAsistenciaSocio(socio: Pick<Socio, 'id'>, origen:
 
   const desde = new Date(Date.now() - config.minutosAntiDuplicadoIngreso * 60_000)
   const reciente = await prisma.asistencia.findFirst({
-    where: { socioId: socio.id, validacion: { not: 'ANULADA' }, fechaHora: { gte: desde } },
+    where: { socioId: socio.id, validacion: { not: 'ANULADA' }, salidaAt: null, fechaHora: { gte: desde } },
     select: { id: true },
   })
   if (reciente) return { resultado: 'DUPLICADO' }

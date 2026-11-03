@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import useSWR from 'swr'
-import { Cake, Check, Clock, HeartPulse, RefreshCw, UserX, Volume2, VolumeX } from 'lucide-react'
+import { Cake, Check, Clock, HeartPulse, LogOut, RefreshCw, UserX, Volume2, VolumeX } from 'lucide-react'
 import { Modal } from '@/components/Modal'
 import { Spinner } from '@/components/Spinner'
 import { useToast } from '@/components/Toast'
@@ -29,6 +29,7 @@ interface Tarjeta {
 interface Feed {
   items: Tarjeta[]
   pendientes: number
+  salieron: number
   coaches: { id: string; nombre: string; presente: boolean; hora: string; tipo: 'ENTRADA' | 'SALIDA' }[]
 }
 
@@ -89,6 +90,13 @@ export default function IngresoPage() {
     void mutate()
   }
 
+  async function marcarSalida(t: Tarjeta) {
+    const r = await api(`/api/asistencias/${t.id}/salida`, { method: 'POST', body: {} })
+    if (!r.ok) return toast.error(r.error)
+    toast.success(`${t.socio.nombre} salió`)
+    void mutate()
+  }
+
   async function registrarManual(e: React.FormEvent) {
     e.preventDefault()
     setRegistrando(true)
@@ -110,7 +118,8 @@ export default function IngresoPage() {
           <p className="eyebrow">En vivo</p>
           <h1 className="page-heading text-4xl">Ingresos de hoy</h1>
           <p className="text-sm text-ink-500">
-            {activos.length} {activos.length === 1 ? 'ingreso' : 'ingresos'}
+            {activos.length} {activos.length === 1 ? 'socio en el gimnasio' : 'socios en el gimnasio'}
+            {data && data.salieron > 0 && <> · {data.salieron} ya {data.salieron === 1 ? 'salió' : 'salieron'}</>}
             {data && data.pendientes > 0 && <> · <strong className="text-danger-600">{data.pendientes} por revisar</strong></>}
           </p>
         </div>
@@ -154,7 +163,7 @@ export default function IngresoPage() {
       {!data && !error && <p className="flex items-center gap-2 text-ink-500"><Spinner /> Cargando…</p>}
       {data && items.length === 0 && (
         <div className="card-surface py-12 text-center text-ink-500">
-          <p className="font-display text-2xl font-bold text-ink-800">Aún no hay ingresos hoy</p>
+          <p className="font-display text-2xl font-bold text-ink-800">{data.salieron > 0 ? 'No hay socios en el gimnasio' : 'Aún no hay ingresos hoy'}</p>
           <p className="mt-1 text-sm">Cuando un socio escanee el QR de la entrada, aparecerá aquí.</p>
         </div>
       )}
@@ -216,6 +225,7 @@ export default function IngresoPage() {
                 )}
                 {t.validacion === 'CONFIRMADA' && <span className="badge bg-emerald-100 text-emerald-800"><Check size={13} className="mr-1" /> Confirmado</span>}
                 {anulada && <span className="badge bg-ink-100 text-ink-600">Anulado: {t.motivo}</span>}
+                <button type="button" onClick={() => void marcarSalida(t)} className="btn-ghost btn-sm" title="Quitar de la lista: ya salió"><LogOut size={15} /> Salió</button>
                 {!anulada && (noVigente || t.estado === 'POR_VENCER') && !t.renovacionProgramada && (
                   <button type="button" onClick={() => setRenovando(t)} className="btn-ghost btn-sm ml-auto">Renovar</button>
                 )}

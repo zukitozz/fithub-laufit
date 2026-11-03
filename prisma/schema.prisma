@@ -219,6 +219,7 @@ model Asistencia {
   validadaAt      DateTime?
   motivo          String? // obligatorio al anular
   ip              String?
+  salidaAt        DateTime? // recepción marcó que ya salió: deja de verse en ingresos en vivo
 
   @@index([socioId, fechaHora])
   @@index([fechaHora])
