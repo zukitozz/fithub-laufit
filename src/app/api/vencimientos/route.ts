@@ -2,15 +2,15 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireApiAuth } from '@/lib/api-auth'
 import { obtenerConfiguracion } from '@/lib/config'
-import { hoyFecha, situacionSocio, sumarDias } from '@/lib/membresias'
+import { hoyFecha, situacionSocio } from '@/lib/membresias'
 import { urlFirmada } from '@/lib/storage'
-import { clasificarVencimiento, compararUrgencia, DIAS_VENCIDOS_MAX, type TabVencimiento } from '@/lib/vencimientos'
+import { clasificarVencimiento, compararUrgencia, type TabVencimiento } from '@/lib/vencimientos'
 
 export const dynamic = 'force-dynamic'
 
-const TABS: TabVencimiento[] = ['hoy', 'proximos', 'vencidos', 'pospuestos']
+const TABS: TabVencimiento[] = ['hoy', 'proximos', 'vencidos', 'inactivos', 'pospuestos']
 
-// Lista de trabajo de renovaciones: quién vence hoy, en los próximos 7 días, o venció en los últimos 30.
+// Lista de trabajo de renovaciones: quién vence hoy, en los próximos 7 días, venció hace poco (Vencidos) o hace más que el límite de Ajustes (Inactivos).
 // ?tab=hoy|proximos|vencidos|pospuestos  ?q=nombre, documento o celular  ?plan=<id>
 export async function GET(req: Request) {
   const guard = await requireApiAuth(['ADMIN', 'SUPERVISOR'])
@@ -26,15 +26,15 @@ export async function GET(req: Request) {
   const hoy = hoyFecha()
   const ahora = new Date()
 
-  // Candidatos: socios activos con alguna membresía que terminó hace menos de 30 días (o que aún corre).
+  // Candidatos: socios activos con alguna membresía no anulada (los inactivos son quienes vencieron hace más del límite).
   const socios = await prisma.socio.findMany({
-    where: { activo: true, membresias: { some: { anulada: false, fechaFin: { gte: sumarDias(hoy, -DIAS_VENCIDOS_MAX) } } } },
+    where: { activo: true, membresias: { some: { anulada: false } } },
     include: { membresias: { where: { anulada: false }, include: { plan: { select: { id: true, nombre: true } } } } },
   })
 
   const filas = socios.flatMap((s) => {
     const situacion = situacionSocio(s.membresias, config, hoy)
-    const clase = clasificarVencimiento({ diasRestantes: situacion.diasRestantes, tieneRenovacion: Boolean(situacion.programada), pospuestoHasta: s.recordatorioPospuestoHasta }, ahora)
+    const clase = clasificarVencimiento({ diasRestantes: situacion.diasRestantes, tieneRenovacion: Boolean(situacion.programada), pospuestoHasta: s.recordatorioPospuestoHasta }, ahora, config.diasVencidosMax)
     if (!clase || !situacion.membresia || situacion.diasRestantes === null || !situacion.fechaFin) return []
     return [{ socio: s, clase, membresia: situacion.membresia, diasRestantes: situacion.diasRestantes, fechaFin: situacion.fechaFin }]
   })
@@ -82,5 +82,5 @@ export async function GET(req: Request) {
   )
   items.sort(compararUrgencia)
 
-  return NextResponse.json({ tab, conteos, items })
+  return NextResponse.json({ tab, conteos, items, diasVencidosMax: config.diasVencidosMax })
 }

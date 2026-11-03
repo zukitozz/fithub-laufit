@@ -15,7 +15,7 @@ export async function GET() {
 }
 
 const TEXTOS = ['nombreGimnasio', 'direccion', 'telefonoContacto', 'razonSocial', 'direccionFiscal', 'codigoUbigeo'] as const
-const ENTEROS = ['diasAvisoVencimiento', 'diasGracia', 'minutosAntiDuplicadoIngreso'] as const
+const ENTEROS = ['diasAvisoVencimiento', 'diasGracia', 'diasVencidosMax', 'minutosAntiDuplicadoIngreso'] as const
 const BOOLEANOS = ['whatsappActivo'] as const
 
 export async function PATCH(req: Request) {
@@ -32,7 +32,7 @@ export async function PATCH(req: Request) {
   for (const campo of ENTEROS) {
     if (campo in body) {
       const n = Number(body[campo])
-      if (!Number.isInteger(n) || n < 0 || n > 365) return NextResponse.json({ error: `Valor inválido en ${campo}` }, { status: 400 })
+      if (!Number.isInteger(n) || n < (campo === 'diasVencidosMax' ? 1 : 0) || n > 365) return NextResponse.json({ error: `Valor inválido en ${campo}` }, { status: 400 })
       data[campo] = n
     }
   }

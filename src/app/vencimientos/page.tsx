@@ -10,14 +10,14 @@ import { useToast } from '@/components/Toast'
 import { VentaMembresiaModal } from '@/components/VentaMembresiaModal'
 import { Avatar, api, fechaCorta, fetcher, haceDias, textoDias } from '@/components/ui'
 
-type Tab = 'hoy' | 'proximos' | 'vencidos' | 'pospuestos'
+type Tab = 'hoy' | 'proximos' | 'vencidos' | 'inactivos' | 'pospuestos'
 
 interface Item {
   socio: { id: string; nombre: string; tipoDocumento: string; numeroDocumento: string; celular: string | null; fotoUrl: string | null }
   plan: string
   fechaFin: string
   diasRestantes: number
-  base: 'hoy' | 'proximos' | 'vencidos'
+  base: 'hoy' | 'proximos' | 'vencidos' | 'inactivos'
   pospuestoHasta: string | null
   visitas30: number
   ultimaVisita: string | null
@@ -27,6 +27,7 @@ interface Item {
 interface Respuesta {
   tab: Tab
   conteos: Record<Tab, number>
+  diasVencidosMax: number
   items: Item[]
 }
 
@@ -35,7 +36,8 @@ interface Plan { id: string; nombre: string }
 const TABS: { id: Tab; etiqueta: string; alerta: boolean }[] = [
   { id: 'hoy', etiqueta: 'Vencen hoy', alerta: true },
   { id: 'proximos', etiqueta: 'Próximos 7 días', alerta: false },
-  { id: 'vencidos', etiqueta: 'Vencidos (30 días)', alerta: true },
+  { id: 'vencidos', etiqueta: 'Vencidos', alerta: true },
+  { id: 'inactivos', etiqueta: 'Inactivos', alerta: false },
   { id: 'pospuestos', etiqueta: 'Pospuestos', alerta: false },
 ]
 
@@ -86,7 +88,7 @@ export default function VencimientosPage() {
         <p className="text-sm text-ink-500">Quién vence o venció hace poco y todavía no renovó. Contáctalos antes de que dejen de venir.</p>
       </header>
 
-      <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4" role="tablist" aria-label="Grupos de vencimientos">
+      <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-5" role="tablist" aria-label="Grupos de vencimientos">
         {TABS.map((t) => {
           const n = data?.conteos[t.id] ?? 0
           const activa = tab === t.id
@@ -99,7 +101,7 @@ export default function VencimientosPage() {
               onClick={() => setTab(t.id)}
               className={`rounded-2xl border-2 px-4 py-3 text-left transition ${activa ? 'border-brand-600 bg-brand-50' : 'border-ink-100 bg-white hover:border-ink-300'}`}
             >
-              <span className="block text-xs font-bold uppercase tracking-wide text-ink-500">{t.etiqueta}</span>
+              <span className="block text-xs font-bold uppercase tracking-wide text-ink-500">{t.etiqueta}{t.id === 'vencidos' && data ? ` (${data.diasVencidosMax} días)` : ''}</span>
               <span className={`font-display text-4xl font-extrabold leading-none ${t.alerta && n > 0 ? 'text-danger-600' : 'text-ink-900'}`}>{data ? n : '–'}</span>
             </button>
           )
@@ -116,6 +118,10 @@ export default function VencimientosPage() {
           {planes?.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
         </select>
       </div>
+
+      {tab === 'inactivos' && data && (
+        <p className="mb-3 text-sm text-ink-500">Socios que vencieron hace más de {data.diasVencidosMax} días y no renovaron. Puedes reactivarlos con “Renovar”. El límite se cambia en Ajustes.</p>
+      )}
 
       {error && <p role="alert" className="mb-3 rounded-xl bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">{String(error.message)}</p>}
       {isLoading && !data && <p className="text-ink-500"><Spinner /> Cargando…</p>}

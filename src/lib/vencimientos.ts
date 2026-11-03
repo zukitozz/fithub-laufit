@@ -1,8 +1,8 @@
-export type TabVencimiento = 'hoy' | 'proximos' | 'vencidos' | 'pospuestos'
+export type TabVencimiento = 'hoy' | 'proximos' | 'vencidos' | 'inactivos' | 'pospuestos'
 
 /** "Próximos": vencen dentro de este número de días. */
 export const DIAS_PROXIMOS = 7
-/** Hasta cuántos días vencido se sigue mostrando para llamar; después se considera inactivo. */
+/** Valor por defecto (configurable en Ajustes): hasta cuántos días vencido se sigue en "Vencidos"; después pasa a "Inactivos". */
 export const DIAS_VENCIDOS_MAX = 30
 
 export interface EntradaVencimiento {
@@ -22,14 +22,15 @@ export interface ResultadoVencimiento {
 }
 
 /** Decide si un socio debe aparecer en el seguimiento de vencimientos y en qué pestaña. Null = no aparece. */
-export function clasificarVencimiento(e: EntradaVencimiento, ahora: Date = new Date()): ResultadoVencimiento | null {
+export function clasificarVencimiento(e: EntradaVencimiento, ahora: Date = new Date(), diasVencidosMax: number = DIAS_VENCIDOS_MAX): ResultadoVencimiento | null {
   const dias = e.diasRestantes
   if (dias === null || e.tieneRenovacion) return null
 
   let base: ResultadoVencimiento['base'] | null = null
   if (dias === 0) base = 'hoy'
   else if (dias > 0 && dias <= DIAS_PROXIMOS) base = 'proximos'
-  else if (dias < 0 && dias >= -DIAS_VENCIDOS_MAX) base = 'vencidos'
+  else if (dias < 0 && dias >= -diasVencidosMax) base = 'vencidos'
+  else if (dias < -diasVencidosMax) base = 'inactivos'
   if (!base) return null
 
   const pospuesto = e.pospuestoHasta !== null && e.pospuestoHasta.getTime() > ahora.getTime()

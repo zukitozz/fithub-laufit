@@ -17,6 +17,7 @@ interface Config {
   codigoUbigeo: string | null
   diasAvisoVencimiento: number
   diasGracia: number
+  diasVencidosMax: number
   minutosAntiDuplicadoIngreso: number
   whatsappActivo: boolean
 }
@@ -126,11 +127,13 @@ export default function AjustesPage() {
 
           <div>
             <h2 className="font-display text-2xl font-bold">Membresías y asistencia</h2>
-            <div className="mt-3 grid gap-3 md:grid-cols-3">
+            <div className="mt-3 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
               <Numero id="av" titulo="Marcar “por vencer” desde (días)" valor={form.diasAvisoVencimiento} onChange={(v) => set('diasAvisoVencimiento', v)} />
               <Numero id="gr" titulo="Días de gracia tras vencer" valor={form.diasGracia} onChange={(v) => set('diasGracia', v)} />
+              <Numero id="vm" titulo="Vencidos: seguir llamando hasta (días)" valor={form.diasVencidosMax} onChange={(v) => set('diasVencidosMax', v)} min={1} />
               <Numero id="ad" titulo="No repetir ingreso antes de (min)" valor={form.minutosAntiDuplicadoIngreso} onChange={(v) => set('minutosAntiDuplicadoIngreso', v)} />
             </div>
+            <p className="mt-2 text-xs text-ink-500">En Vencimientos, quien lleva más de esos días vencido sin renovar pasa de “Vencidos” a “Inactivos”.</p>
           </div>
 
           <div>
@@ -183,11 +186,11 @@ function Campo({ id, titulo, valor, onChange, requerido }: { id: string; titulo:
   )
 }
 
-function Numero({ id, titulo, valor, onChange }: { id: string; titulo: string; valor: number; onChange: (v: number) => void }) {
+function Numero({ id, titulo, valor, onChange, min = 0 }: { id: string; titulo: string; valor: number; onChange: (v: number) => void; min?: number }) {
   return (
     <div>
       <label htmlFor={id} className="label">{titulo}</label>
-      <input id={id} type="number" min={0} max={365} value={valor} onChange={(e) => onChange(Number(e.target.value))} className="field" />
+      <input id={id} type="number" min={min} max={365} value={valor} onChange={(e) => onChange(Number(e.target.value))} className="field" />
     </div>
   )
 }

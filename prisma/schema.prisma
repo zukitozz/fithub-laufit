@@ -481,6 +481,8 @@ model Configuracion {
   // Membresías
   diasAvisoVencimiento        Int      @default(7)
   diasGracia                  Int      @default(0)
+  // Vencimientos: hasta cuántos días vencido se sigue en "Vencidos"; después pasa a "Inactivos"
+  diasVencidosMax             Int      @default(30)
   // Asistencia
   minutosAntiDuplicadoIngreso Int      @default(60)
   // Token del QR de la sede; el supervisor puede regenerarlo si el QR se filtra.
