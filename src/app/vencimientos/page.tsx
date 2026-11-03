@@ -17,6 +17,7 @@ interface Item {
   plan: string
   fechaFin: string
   diasRestantes: number
+  anulada: boolean
   base: 'hoy' | 'proximos' | 'vencidos' | 'inactivos'
   pospuestoHasta: string | null
   visitas30: number
@@ -141,10 +142,10 @@ export default function VencimientosPage() {
               <div className="min-w-0 flex-1 basis-60">
                 <Link href={`/socios/${i.socio.id}`} className="font-display text-2xl font-bold leading-tight text-ink-900 hover:text-brand-600">{i.socio.nombre}</Link>
                 <p className="text-xs text-ink-400">{i.socio.tipoDocumento} {i.socio.numeroDocumento}{i.socio.celular && <> · {i.socio.celular}</>}</p>
-                <p className="mt-1 text-sm text-ink-600">{i.plan} · vence {fechaCorta(i.fechaFin)}</p>
+                <p className="mt-1 text-sm text-ink-600">{i.plan} · {i.anulada ? 'anulada' : `vence ${fechaCorta(i.fechaFin)}`}</p>
               </div>
               <div className="text-right">
-                <p className={`font-display text-3xl font-bold leading-none ${colorDias(i.diasRestantes)}`}>{textoDias(i.diasRestantes)}</p>
+                <p className={`font-display text-3xl font-bold leading-none ${colorDias(i.diasRestantes)}`}>{i.anulada ? 'Anulada' : textoDias(i.diasRestantes)}</p>
                 <p className="mt-1 text-xs text-ink-500">
                   {i.visitas30} {i.visitas30 === 1 ? 'visita' : 'visitas'} en 30 días · {i.ultimaVisita ? `vino ${haceDias(i.ultimaVisita)}` : 'sin visitas'}
                 </p>

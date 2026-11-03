@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireApiAuth } from '@/lib/api-auth'
 import { obtenerConfiguracion } from '@/lib/config'
-import { hoyFecha, situacionSocio } from '@/lib/membresias'
+import { diasRestantes, hoyFecha, situacionSocio } from '@/lib/membresias'
 import { urlFirmada } from '@/lib/storage'
 import { clasificarVencimiento, compararUrgencia, type TabVencimiento } from '@/lib/vencimientos'
 
@@ -28,15 +28,23 @@ export async function GET(req: Request) {
 
   // Candidatos: socios activos con alguna membresía no anulada (los inactivos son quienes vencieron hace más del límite).
   const socios = await prisma.socio.findMany({
-    where: { activo: true, membresias: { some: { anulada: false } } },
-    include: { membresias: { where: { anulada: false }, include: { plan: { select: { id: true, nombre: true } } } } },
+    where: { activo: true, membresias: { some: {} } },
+    include: { membresias: { include: { plan: { select: { id: true, nombre: true } } } } },
   })
 
   const filas = socios.flatMap((s) => {
     const situacion = situacionSocio(s.membresias, config, hoy)
+    // Solo tiene membresías anuladas (p. ej. la anularon): queda sin plan, va directo a Inactivos para poder reactivarlo.
+    if (!situacion.membresia && !situacion.programada) {
+      const ultima = [...s.membresias].sort((a, b) => b.fechaFin.getTime() - a.fechaFin.getTime())[0]
+      if (!ultima) return []
+      const pospuesto = s.recordatorioPospuestoHasta !== null && s.recordatorioPospuestoHasta.getTime() > ahora.getTime()
+      const dias = diasRestantes(ultima.fechaFin, hoy)
+      return [{ socio: s, clase: { base: 'inactivos' as const, pospuesto, tab: pospuesto ? ('pospuestos' as const) : ('inactivos' as const) }, membresia: ultima, diasRestantes: dias, fechaFin: ultima.fechaFin, anulada: true }]
+    }
     const clase = clasificarVencimiento({ diasRestantes: situacion.diasRestantes, tieneRenovacion: Boolean(situacion.programada), pospuestoHasta: s.recordatorioPospuestoHasta }, ahora, config.diasVencidosMax)
     if (!clase || !situacion.membresia || situacion.diasRestantes === null || !situacion.fechaFin) return []
-    return [{ socio: s, clase, membresia: situacion.membresia, diasRestantes: situacion.diasRestantes, fechaFin: situacion.fechaFin }]
+    return [{ socio: s, clase, membresia: situacion.membresia, diasRestantes: situacion.diasRestantes, fechaFin: situacion.fechaFin, anulada: false }]
   })
 
   const conteos = Object.fromEntries(TABS.map((t) => [t, filas.filter((f) => f.clase.tab === t).length]))
@@ -72,6 +80,7 @@ export async function GET(req: Request) {
         plan: f.membresia.plan.nombre,
         fechaFin: f.fechaFin,
         diasRestantes: f.diasRestantes,
+        anulada: f.anulada,
         base: f.clase.base,
         pospuestoHasta: f.clase.pospuesto ? f.socio.recordatorioPospuestoHasta : null,
         visitas30: visitas.find((v) => v.socioId === f.socio.id)?._count._all ?? 0,
